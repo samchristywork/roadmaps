@@ -5,6 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TODO</title>
     <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      fill: #333;
+    }
+
+    .node {
+      fill: #fff;
+    }
+
+    .node circle {
+      stroke: steelblue;
+      stroke-width: 3px;
+      cursor: pointer;
+    }
+
+    .node text {
+      fill: #333;
+      font: 12px sans-serif;
+    }
+
+    .node .selected text {
+      fill: red;
+    }
+
+    .link {
+      fill: none;
+      stroke: #ccc;
+      stroke-width: 2px;
+    }
+
+    .toggled {
+      fill: orange;
+    }
+
+    svg {
+      width: 99vw;
+      height: 99vh;
+      background-image:
+        linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+        linear-gradient(rgba(0, 0, 0, 0.1) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.1) 2px, transparent 2px);
+      background-size:
+        20px 20px,
+        20px 20px,
+        100px 100px,
+        100px 100px;
+    }
     </style>
   </head>
   <body>
