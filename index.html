@@ -108,6 +108,7 @@
           .attr("r", 10)
           .attr("class", d => d.data.done ? "toggled" : "")
           .on("click", toggleNode)
+          .on("contextmenu", addNode)
           .on("dblclick", openNodeMenu)
           .on("mouseover", function() {
             d3.select(this).attr("r", 15);
@@ -121,6 +122,18 @@
           .attr("x", 0)
           .style("text-anchor", "middle")
           .text(d => d.data.name);
+      }
+
+      function addNode(event, d) {
+        event.preventDefault();
+        const nodeName = prompt("Enter name for new node:");
+        if (nodeName) {
+          if (!d.data.children) {
+            d.data.children = [];
+          }
+          d.data.children.push({ name: nodeName });
+          update(treeData);
+        }
       }
 
       function update(source) {
