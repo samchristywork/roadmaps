@@ -58,6 +58,23 @@
         100px 100px,
         100px 100px;
     }
+
+    .save-button {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      padding: 10px 20px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .save-button:hover {
+      background: #0056b3;
+    }
     </style>
   </head>
   <body>
@@ -177,7 +194,31 @@
           });
       }
 
+      function setupSaveButton() {
+        document.getElementById('saveButton').addEventListener('click', () => {
+          if (treeData) {
+            const jsonStr = JSON.stringify(treeData, null, 2);
+            fetch('/save?id=' + idParam, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: jsonStr
+            }).then(response => {
+              if (response.ok) {
+                alert('Data saved successfully!');
+              } else {
+                alert('Error saving data.');
+              }
+            });
+          } else {
+            alert('No data available.');
+          }
+        });
+      }
+
       fetchTreeData();
+      setupSaveButton();
 
       window.addEventListener('resize', () => {
         if (treeData) {
