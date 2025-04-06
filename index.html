@@ -141,6 +141,27 @@
           .text(d => d.data.name);
       }
 
+      function deleteNode(event, d) {
+        event.stopPropagation();
+        const parent = d.parent;
+
+        if (parent) {
+          parent.data.children = parent.data.children.filter(child => child !== d.data);
+          update(treeData);
+        } else {
+          alert("Root node cannot be deleted");
+        }
+      }
+
+      function renameNode(event, d) {
+        event.stopPropagation();
+        const newName = prompt("Enter new name for node:", d.data.name);
+        if (newName) {
+          d.data.name = newName;
+          update(treeData);
+        }
+      }
+
       function addNode(event, d) {
         event.preventDefault();
         const nodeName = prompt("Enter name for new node:");
