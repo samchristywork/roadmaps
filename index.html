@@ -75,6 +75,15 @@
     .save-button:hover {
       background: #0056b3;
     }
+
+    .node-menu {
+      position: absolute;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      z-index: 1000;
+    }
     </style>
   </head>
   <body>
@@ -139,6 +148,30 @@
           .attr("x", 0)
           .style("text-anchor", "middle")
           .text(d => d.data.name);
+      }
+
+      function openNodeMenu(event, d) {
+        event.preventDefault();
+        const menu = document.getElementById('nodeMenu');
+        menu.style.display = 'block';
+        menu.style.left = `${event.pageX}px`;
+        menu.style.top = `${event.pageY}px`;
+
+        const renameButton = document.getElementById('renameNodeButton');
+        renameButton.onclick = (e) => {
+          renameNode(e, d);
+          menu.style.display = 'none';
+        };
+
+        const deleteButton = document.getElementById('deleteNodeButton');
+        deleteButton.onclick = (e) => {
+          deleteNode(e, d);
+          menu.style.display = 'none';
+        };
+
+        document.addEventListener('click', () => {
+          menu.style.display = 'none';
+        }, { once: true });
       }
 
       function deleteNode(event, d) {
