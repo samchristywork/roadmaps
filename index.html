@@ -344,6 +344,45 @@
           update(treeData);
         }
       });
+
+      // TODO: Why doesn't the arrow key navigation work unless I click on the
+      // page first?
+      window.addEventListener('keydown', (event) => {
+        if (selectedNode) {
+          if (event.key === 'ArrowRight') {
+            selectedNode = selectedNode.children ? selectedNode.children[0] : selectedNode;
+          } else if (event.key === 'ArrowLeft') {
+            selectedNode = selectedNode.parent;
+          } else if (event.key === 'ArrowDown') {
+            let parent = selectedNode.parent;
+            let idxOfSelected = parent.children.indexOf(selectedNode);
+            selectedNode = parent.children[idxOfSelected + 1] || selectedNode;
+          } else if (event.key === 'ArrowUp') {
+            let parent = selectedNode.parent;
+            let idxOfSelected = parent.children.indexOf(selectedNode);
+            selectedNode = parent.children[idxOfSelected - 1] || selectedNode;
+          } else if (event.key === ' ') {
+            selectedNode.data.done = !selectedNode.data.done;
+          } else if (event.key === 'r') {
+            selectedNode.data.name = prompt("Enter new name for node:",
+              selectedNode.data.name);
+          } else if (event.key === 'n') {
+            let nodeName = prompt("Enter name for new node:");
+            if (nodeName) {
+              if (!selectedNode.data.children) {
+                selectedNode.data.children = [];
+              }
+              selectedNode.data.children.push({ name: nodeName });
+            }
+          }
+        } else {
+          selectedNode = rootNode;
+        }
+
+        if (treeData) {
+          update(treeData);
+        }
+      });
     </script>
   </body>
 </html>
