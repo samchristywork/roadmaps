@@ -93,6 +93,16 @@
       background: #0056b3;
     }
 
+    .instructions {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: white;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
     .node-menu {
       position: absolute;
       background: white;
@@ -110,6 +120,14 @@
     <div id="nodeMenu" class="node-menu" style="display:none;">
       <button id="renameNodeButton">Rename Node</button>
       <button id="deleteNodeButton">Delete Node</button>
+    </div>
+    <div class="instructions">
+      <p><b>Click</b> to toggle node state</p>
+      <p><b>Right-click</b> to add a node</p>
+      <p><b>Double-click</b> to open node menu</p>
+      <p><b>Arrow Keys</b> to navigate</p>
+      <p><b>Space</b> to toggle node state</p>
+      <p><b>r</b> to rename node</p>
     </div>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script>
@@ -215,6 +233,13 @@
           d.data.name = newName;
           update(treeData);
         }
+      }
+
+      function toggleNode(event, d) {
+        const circle = d3.select(this);
+        circle.classed("toggled", !circle.classed("toggled"));
+        d.data.done = !d.data.done;
+        console.log('Updated JSON:', JSON.stringify(treeData));
       }
 
       function addNode(event, d) {
