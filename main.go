@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
-	"io"
+	"regexp"
 )
 
 func writeToFile(filename string, data []byte) error {
@@ -23,6 +24,8 @@ func writeToFile(filename string, data []byte) error {
 	return nil
 }
 
+var safeID = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
+
 func saveHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -30,6 +33,10 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := r.URL.Query().Get("id")
+	if !safeID.MatchString(id) {
+		http.Error(w, "Invalid id", http.StatusBadRequest)
+		return
+	}
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
