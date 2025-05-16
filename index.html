@@ -267,6 +267,7 @@
             if (!sel.parent) { alert("Cannot delete root node."); dirty = false; break; }
             const parentData = sel.parent.data;
             parentData.children = parentData.children.filter(c => c !== sel.data);
+            if (parentData.children.length === 0) delete parentData.children;
             selectedNodeData = sel.parent.data;
             break;
           }
