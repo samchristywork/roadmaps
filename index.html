@@ -22,16 +22,11 @@
     .node circle {
       stroke: steelblue;
       stroke-width: 3px;
-      cursor: pointer;
     }
 
     .node text {
       fill: #333;
       font: 12px sans-serif;
-    }
-
-    .node .selected text {
-      fill: red;
     }
 
     .link {
@@ -42,6 +37,11 @@
 
     .toggled {
       fill: orange;
+    }
+
+    .selected-node {
+      stroke: #ff6600 !important;
+      stroke-width: 4px !important;
     }
 
     svg {
@@ -59,83 +59,59 @@
         100px 100px;
     }
 
-    .save-button {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      padding: 10px 20px;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .save-button:hover {
-      background: #0056b3;
-    }
-
-    .style-button {
-      position: absolute;
-      top: 10px;
-      left: 120px;
-      padding: 10px 20px;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .style-button:hover {
-      background: #0056b3;
-    }
-
-    .instructions {
+    .keybindings {
       position: absolute;
       top: 10px;
       right: 10px;
       background: white;
-      padding: 10px;
+      padding: 10px 14px;
       border: 1px solid #ccc;
       border-radius: 5px;
+      font-family: monospace;
+      font-size: 12px;
     }
 
-    .node-menu {
-      position: absolute;
-      background: white;
+    .keybindings table {
+      border-collapse: collapse;
+    }
+
+    .keybindings td {
+      padding: 2px 6px;
+    }
+
+    .keybindings kbd {
+      display: inline-block;
+      padding: 1px 5px;
+      background: #f5f5f5;
       border: 1px solid #ccc;
-      border-radius: 5px;
-      padding: 10px;
-      z-index: 1000;
+      border-radius: 3px;
+      font-size: 11px;
     }
     </style>
   </head>
   <body>
     <svg></svg>
-    <button id="saveButton" class="save-button">Save</button>
-    <button id="styleButton" class="style-button">Style</button>
-    <div id="nodeMenu" class="node-menu" style="display:none;">
-      <button id="renameNodeButton">Rename Node</button>
-      <button id="deleteNodeButton">Delete Node</button>
-    </div>
-    <div class="instructions">
-      <p><b>Click</b> to toggle node state</p>
-      <p><b>Right-click</b> to add a node</p>
-      <p><b>Double-click</b> to open node menu</p>
-      <p><b>Arrow Keys</b> to navigate</p>
-      <p><b>Space</b> to toggle node state</p>
-      <p><b>r</b> to rename node</p>
+    <div class="keybindings">
+      <table>
+        <tr><td><kbd>h</kbd></td><td>go to parent</td></tr>
+        <tr><td><kbd>l</kbd></td><td>go to first child</td></tr>
+        <tr><td><kbd>j</kbd></td><td>next sibling</td></tr>
+        <tr><td><kbd>k</kbd></td><td>prev sibling</td></tr>
+        <tr><td><kbd>i</kbd></td><td>insert child</td></tr>
+        <tr><td><kbd>o</kbd></td><td>insert sibling below</td></tr>
+        <tr><td><kbd>r</kbd></td><td>rename</td></tr>
+        <tr><td><kbd>x</kbd></td><td>delete node</td></tr>
+        <tr><td><kbd>t</kbd></td><td>toggle done</td></tr>
+        <tr><td><kbd>s</kbd></td><td>save</td></tr>
+        <tr><td><kbd>c</kbd></td><td>invert colors</td></tr>
+      </table>
     </div>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script>
       let treeData;
       let params = new URLSearchParams(window.location.search);
       let idParam = params.get('id');
-      let selectedNode = null;
-      let rootNode = null;
+      let selectedNodeData = null;
 
       function initializeSVG(margin, width, height) {
         return d3.select("svg")
@@ -146,8 +122,12 @@
           .attr("transform", `translate(${margin.left},${margin.top})`);
       }
 
-      function createTreeMap(height, width) {
-        return d3.tree().size([height, width]);
+      function buildHierarchy() {
+        const margin = { top: 100, right: 200, bottom: 100, left: 200 };
+        const width = window.innerWidth - margin.left - margin.right;
+        const height = window.innerHeight - margin.top - margin.bottom;
+        const treemap = d3.tree().size([height, width]);
+        return { nodes: treemap(d3.hierarchy(treeData)), margin, width, height };
       }
 
       function drawLinks(g, nodes) {
@@ -172,15 +152,10 @@
 
         node.append("circle")
           .attr("r", 10)
-          .attr("class", d => d.data.done ? "toggled" : "")
-          .on("click", toggleNode)
-          .on("contextmenu", addNode)
-          .on("dblclick", openNodeMenu)
-          .on("mouseover", function() {
-            d3.select(this).attr("r", 15);
-          })
-          .on("mouseout", function() {
-            d3.select(this).attr("r", 10);
+          .attr("class", d => {
+            const done = d.data.done ? "toggled" : "";
+            const sel = d.data === selectedNodeData ? "selected-node" : "";
+            return [done, sel].filter(Boolean).join(" ");
           });
 
         node.append("text")
@@ -190,198 +165,125 @@
           .text(d => d.data.name);
       }
 
-      function openNodeMenu(event, d) {
-        event.preventDefault();
-        const menu = document.getElementById('nodeMenu');
-        menu.style.display = 'block';
-        menu.style.left = `${event.pageX}px`;
-        menu.style.top = `${event.pageY}px`;
-
-        const renameButton = document.getElementById('renameNodeButton');
-        renameButton.onclick = (e) => {
-          renameNode(e, d);
-          menu.style.display = 'none';
-        };
-
-        const deleteButton = document.getElementById('deleteNodeButton');
-        deleteButton.onclick = (e) => {
-          deleteNode(e, d);
-          menu.style.display = 'none';
-        };
-
-        document.addEventListener('click', () => {
-          menu.style.display = 'none';
-        }, { once: true });
-      }
-
-      function deleteNode(event, d) {
-        event.stopPropagation();
-        const parent = d.parent;
-
-        if (parent) {
-          parent.data.children = parent.data.children.filter(child => child !== d.data);
-          update(treeData);
-        } else {
-          alert("Root node cannot be deleted");
-        }
-      }
-
-      function renameNode(event, d) {
-        event.stopPropagation();
-        const newName = prompt("Enter new name for node:", d.data.name);
-        if (newName) {
-          d.data.name = newName;
-          update(treeData);
-        }
-      }
-
-      function toggleNode(event, d) {
-        const circle = d3.select(this);
-        circle.classed("toggled", !circle.classed("toggled"));
-        d.data.done = !d.data.done;
-        console.log('Updated JSON:', JSON.stringify(treeData));
-      }
-
-      function addNode(event, d) {
-        event.preventDefault();
-        const nodeName = prompt("Enter name for new node:");
-        if (nodeName) {
-          if (!d.data.children) {
-            d.data.children = [];
-          }
-          d.data.children.push({ name: nodeName });
-          update(treeData);
-        }
-      }
-
-      function update(source) {
-        const margin = { top: 100, right: 200, bottom: 100, left: 200 };
-        const width = window.innerWidth - margin.left - margin.right;
-        const height = window.innerHeight - margin.top - margin.bottom;
-
+      function update() {
+        const { nodes, margin, width, height } = buildHierarchy();
         const g = initializeSVG(margin, width, height);
-        const treemap = createTreeMap(height, width);
-        const nodes = treemap(d3.hierarchy(source));
-
-        rootNode = nodes.descendants()[0];
-        if (!selectedNode) {
-          selectedNode = rootNode;
-        }
-
-        g.append("rect")
-          .attr("x", selectedNode.y)
-          .attr("y", selectedNode.x)
-          .attr("width", 40)
-          .attr("height", 40)
-          .attr("fill", "none")
-          .attr("stroke", "black")
-          .attr("stroke-width", 2);
-
+        if (!selectedNodeData) selectedNodeData = nodes.descendants()[0].data;
         drawLinks(g, nodes);
         drawNodes(g, nodes);
       }
 
+      function save() {
+        if (!treeData) return;
+        fetch('/save?id=' + idParam, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(treeData, null, 2)
+        }).then(r => alert(r.ok ? 'Saved!' : 'Error saving data.'));
+      }
+
       function fetchTreeData() {
-        fetch('/data/'+idParam+'.json?rand=' + Math.random())
-          .then(response => response.json())
-          .then(data => {
-            treeData = data;
-            update(treeData);
-          })
-          .catch(error => {
-            console.error('Error fetching or parsing data.json:', error);
-            treeData = { name: "Root", children: [] };
-            update(treeData);
-          });
+        fetch('/data/' + idParam + '.json?rand=' + Math.random())
+          .then(r => r.json())
+          .then(data => { treeData = data; update(); })
+          .catch(() => { treeData = { name: "Root", children: [] }; update(); });
       }
 
-      function setupSaveButton() {
-        document.getElementById('saveButton').addEventListener('click', () => {
-          if (treeData) {
-            const jsonStr = JSON.stringify(treeData, null, 2);
-            fetch('/save?id=' + idParam, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: jsonStr
-            }).then(response => {
-              if (response.ok) {
-                alert('Data saved successfully!');
-              } else {
-                alert('Error saving data.');
-              }
-            });
-          } else {
-            alert('No data available.');
-          }
-        });
-      }
-
-      let style=true;
-      function setupStyleButton() {
-        document.getElementById('styleButton').addEventListener('click', () => {
-          if (style) {
-            let body = document.querySelector("body");
-            body.style.backgroundColor = "black";
-            body.style.filter = "invert(1)";
-            style=false;
-          } else {
-            let body = document.querySelector("body");
-            body.style.backgroundColor = "white";
-            body.style.filter = "invert(0)";
-            style=true;
-          }
-        });
+      let inverted = false;
+      function toggleColors() {
+        inverted = !inverted;
+        document.body.style.backgroundColor = inverted ? "black" : "white";
+        document.body.style.filter = inverted ? "invert(1)" : "invert(0)";
       }
 
       fetchTreeData();
-      setupSaveButton();
-      setupStyleButton();
 
-      window.addEventListener('resize', () => {
-        if (treeData) {
-          update(treeData);
-        }
-      });
+      window.addEventListener('resize', () => { if (treeData) update(); });
 
-      // TODO: Why doesn't the arrow key navigation work unless I click on the
-      // page first?
       window.addEventListener('keydown', (event) => {
-        if (selectedNode) {
-          if (event.key === 'ArrowRight') {
-            selectedNode = selectedNode.children ? selectedNode.children[0] : selectedNode;
-          } else if (event.key === 'ArrowLeft') {
-            selectedNode = selectedNode.parent;
-          } else if (event.key === 'ArrowDown') {
-            let parent = selectedNode.parent;
-            let idxOfSelected = parent.children.indexOf(selectedNode);
-            selectedNode = parent.children[idxOfSelected + 1] || selectedNode;
-          } else if (event.key === 'ArrowUp') {
-            let parent = selectedNode.parent;
-            let idxOfSelected = parent.children.indexOf(selectedNode);
-            selectedNode = parent.children[idxOfSelected - 1] || selectedNode;
-          } else if (event.key === ' ') {
-            selectedNode.data.done = !selectedNode.data.done;
-          } else if (event.key === 'r') {
-            selectedNode.data.name = prompt("Enter new name for node:",
-              selectedNode.data.name);
-          } else if (event.key === 'n') {
-            let nodeName = prompt("Enter name for new node:");
-            if (nodeName) {
-              if (!selectedNode.data.children) {
-                selectedNode.data.children = [];
-              }
-              selectedNode.data.children.push({ name: nodeName });
+        if (!treeData) return;
+
+        const { nodes } = buildHierarchy();
+        const allNodes = nodes.descendants();
+        if (!selectedNodeData) selectedNodeData = allNodes[0].data;
+
+        const sel = allNodes.find(n => n.data === selectedNodeData) || allNodes[0];
+        let dirty = true;
+
+        switch (event.key) {
+          case 'h':
+            if (sel.parent) selectedNodeData = sel.parent.data;
+            break;
+          case 'l':
+            if (sel.children && sel.children.length > 0) selectedNodeData = sel.children[0].data;
+            break;
+          case 'j': {
+            if (sel.parent) {
+              const siblings = sel.parent.children;
+              const idx = siblings.indexOf(sel);
+              if (idx < siblings.length - 1) selectedNodeData = siblings[idx + 1].data;
             }
+            break;
           }
-        } else {
-          selectedNode = rootNode;
+          case 'k': {
+            if (sel.parent) {
+              const siblings = sel.parent.children;
+              const idx = siblings.indexOf(sel);
+              if (idx > 0) selectedNodeData = siblings[idx - 1].data;
+            }
+            break;
+          }
+          case 'i': {
+            const name = prompt("New child node name:");
+            if (name) {
+              if (!sel.data.children) sel.data.children = [];
+              sel.data.children.push({ name });
+            } else { dirty = false; }
+            break;
+          }
+          case 'o': {
+            if (!sel.parent) { alert("Cannot add sibling to root."); dirty = false; break; }
+            const name = prompt("New sibling node name:");
+            if (name) {
+              const parentData = sel.parent.data;
+              if (!parentData.children) parentData.children = [];
+              const idx = parentData.children.indexOf(sel.data);
+              parentData.children.splice(idx + 1, 0, { name });
+            } else { dirty = false; }
+            break;
+          }
+          case 'r': {
+            const newName = prompt("Rename node:", sel.data.name);
+            if (newName) { sel.data.name = newName; } else { dirty = false; }
+            break;
+          }
+          case 'x': {
+            if (!sel.parent) { alert("Cannot delete root node."); dirty = false; break; }
+            const parentData = sel.parent.data;
+            parentData.children = parentData.children.filter(c => c !== sel.data);
+            selectedNodeData = sel.parent.data;
+            break;
+          }
+          case 't':
+            sel.data.done = !sel.data.done;
+            break;
+          case ' ':
+            event.preventDefault();
+            sel.data.done = !sel.data.done;
+            break;
+          case 's':
+            save();
+            dirty = false;
+            break;
+          case 'c':
+            toggleColors();
+            dirty = false;
+            break;
+          default:
+            dirty = false;
         }
 
-        if (treeData) {
-          update(treeData);
-        }
+        if (dirty) update();
       });
     </script>
   </body>
