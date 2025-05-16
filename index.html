@@ -253,7 +253,8 @@
               const parentData = sel.parent.data;
               if (!parentData.children) parentData.children = [];
               const idx = parentData.children.indexOf(sel.data);
-              parentData.children.splice(idx + 1, 0, { name });
+              const insertAt = idx === -1 ? parentData.children.length : idx + 1;
+              parentData.children.splice(insertAt, 0, { name });
             } else { dirty = false; }
             break;
           }
