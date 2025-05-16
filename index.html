@@ -113,6 +113,11 @@
       let idParam = params.get('id');
       let selectedNodeData = null;
 
+      if (!idParam) {
+        document.body.innerHTML = '<p style="padding:2rem;font-family:monospace">Missing <code>?id=</code> parameter. Usage: <code>/?id=my-roadmap</code></p>';
+        throw new Error('Missing id parameter');
+      }
+
       function initializeSVG(margin, width, height) {
         return d3.select("svg")
           .attr("width", width + margin.left + margin.right)
