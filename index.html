@@ -170,8 +170,8 @@
           .text(d => d.data.name);
       }
 
-      function update() {
-        const { nodes, margin, width, height } = buildHierarchy();
+      function update(prebuilt) {
+        const { nodes, margin, width, height } = prebuilt || buildHierarchy();
         const g = initializeSVG(margin, width, height);
         if (!selectedNodeData) selectedNodeData = nodes.descendants()[0].data;
         drawLinks(g, nodes);
@@ -208,12 +208,13 @@
       window.addEventListener('keydown', (event) => {
         if (!treeData) return;
 
-        const { nodes } = buildHierarchy();
-        const allNodes = nodes.descendants();
+        const built = buildHierarchy();
+        const allNodes = built.nodes.descendants();
         if (!selectedNodeData) selectedNodeData = allNodes[0].data;
 
         const sel = allNodes.find(n => n.data === selectedNodeData) || allNodes[0];
         let dirty = true;
+        let dataChanged = false;
 
         switch (event.key) {
           case 'h':
@@ -243,6 +244,7 @@
             if (name) {
               if (!sel.data.children) sel.data.children = [];
               sel.data.children.push({ name });
+              dataChanged = true;
             } else { dirty = false; }
             break;
           }
@@ -255,12 +257,13 @@
               const idx = parentData.children.indexOf(sel.data);
               const insertAt = idx === -1 ? parentData.children.length : idx + 1;
               parentData.children.splice(insertAt, 0, { name });
+              dataChanged = true;
             } else { dirty = false; }
             break;
           }
           case 'r': {
             const newName = prompt("Rename node:", sel.data.name);
-            if (newName) { sel.data.name = newName; } else { dirty = false; }
+            if (newName) { sel.data.name = newName; dataChanged = true; } else { dirty = false; }
             break;
           }
           case 'x': {
@@ -269,14 +272,17 @@
             parentData.children = parentData.children.filter(c => c !== sel.data);
             if (parentData.children.length === 0) delete parentData.children;
             selectedNodeData = sel.parent.data;
+            dataChanged = true;
             break;
           }
           case 't':
             sel.data.done = !sel.data.done;
+            dataChanged = true;
             break;
           case ' ':
             event.preventDefault();
             sel.data.done = !sel.data.done;
+            dataChanged = true;
             break;
           case 's':
             save();
@@ -290,7 +296,7 @@
             dirty = false;
         }
 
-        if (dirty) update();
+        if (dirty) update(dataChanged ? null : built);
       });
     </script>
   </body>
