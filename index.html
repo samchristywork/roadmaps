@@ -133,6 +133,18 @@
       let params = new URLSearchParams(window.location.search);
       let idParam = params.get('id');
       let selectedNodeData = null;
+      let unsaved = false;
+
+      function markUnsaved() {
+        if (unsaved) return;
+        unsaved = true;
+        document.title = '* ' + document.title;
+      }
+
+      function markSaved() {
+        unsaved = false;
+        document.title = document.title.replace(/^\* /, '');
+      }
 
       if (!idParam) {
         document.body.innerHTML = '<p style="padding:2rem;font-family:monospace">Missing <code>?id=</code> parameter. Usage: <code>/?id=my-roadmap</code></p>';
@@ -214,7 +226,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(treeData, null, 2)
-        }).then(r => showToast(r.ok ? 'Saved' : 'Error saving', r.ok));
+        }).then(r => { if (r.ok) markSaved(); showToast(r.ok ? 'Saved' : 'Error saving', r.ok); });
       }
 
       function fetchTreeData() {
@@ -332,7 +344,12 @@
             dirty = false;
         }
 
+        if (dataChanged) markUnsaved();
         if (dirty) update(dataChanged ? null : built);
+      });
+
+      window.addEventListener('beforeunload', (e) => {
+        if (unsaved) e.preventDefault();
       });
     </script>
   </body>
