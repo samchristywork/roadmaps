@@ -87,10 +87,30 @@
       border-radius: 3px;
       font-size: 11px;
     }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 8px 18px;
+      border-radius: 5px;
+      font-family: monospace;
+      font-size: 13px;
+      color: white;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      pointer-events: none;
+    }
+
+    .toast.visible { opacity: 1; }
+    .toast.ok  { background: #28a745; }
+    .toast.err { background: #dc3545; }
     </style>
   </head>
   <body>
     <svg></svg>
+    <div id="toast" class="toast"></div>
     <div class="keybindings">
       <table>
         <tr><td><kbd>h</kbd></td><td>go to parent</td></tr>
@@ -178,13 +198,22 @@
         drawNodes(g, nodes);
       }
 
+      let toastTimer;
+      function showToast(msg, ok) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.className = `toast ${ok ? 'ok' : 'err'} visible`;
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => { el.classList.remove('visible'); }, 2000);
+      }
+
       function save() {
         if (!treeData) return;
         fetch('/save?id=' + idParam, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(treeData, null, 2)
-        }).then(r => alert(r.ok ? 'Saved!' : 'Error saving data.'));
+        }).then(r => showToast(r.ok ? 'Saved' : 'Error saving', r.ok));
       }
 
       function fetchTreeData() {
