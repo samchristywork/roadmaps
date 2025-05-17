@@ -111,7 +111,7 @@
   <body>
     <svg></svg>
     <div id="toast" class="toast"></div>
-    <div class="keybindings">
+    <div id="keybindings" class="keybindings">
       <table>
         <tr><td><kbd>h</kbd></td><td>go to parent</td></tr>
         <tr><td><kbd>l</kbd></td><td>go to first child</td></tr>
@@ -124,6 +124,7 @@
         <tr><td><kbd>t</kbd></td><td>toggle done</td></tr>
         <tr><td><kbd>s</kbd></td><td>save</td></tr>
         <tr><td><kbd>c</kbd></td><td>invert colors</td></tr>
+        <tr><td><kbd>?</kbd></td><td>toggle this panel</td></tr>
       </table>
     </div>
     <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -320,6 +321,11 @@
             break;
           case 'c':
             toggleColors();
+            dirty = false;
+            break;
+          case '?':
+            document.getElementById('keybindings').style.display =
+              document.getElementById('keybindings').style.display === 'none' ? '' : 'none';
             dirty = false;
             break;
           default:
