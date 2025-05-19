@@ -124,6 +124,7 @@
         <tr><td><kbd>t</kbd></td><td>toggle done</td></tr>
         <tr><td><kbd>s</kbd></td><td>save</td></tr>
         <tr><td><kbd>c</kbd></td><td>invert colors</td></tr>
+        <tr><td><kbd>z</kbd></td><td>reset zoom</td></tr>
         <tr><td><kbd>?</kbd></td><td>toggle this panel</td></tr>
       </table>
     </div>
@@ -151,12 +152,24 @@
         throw new Error('Missing id parameter');
       }
 
-      function initializeSVG(margin, width, height) {
-        return d3.select("svg")
-          .attr("width", width + margin.left + margin.right)
-          .attr("height", height + margin.top + margin.bottom)
-          .call(svg => svg.select("g").remove())
-          .append("g")
+      let zoomBehavior;
+
+      function setupZoom() {
+        const svg = d3.select("svg")
+          .attr("width", window.innerWidth)
+          .attr("height", window.innerHeight);
+        svg.append("g").attr("id", "zoom-g");
+        zoomBehavior = d3.zoom()
+          .scaleExtent([0.05, 4])
+          .on("zoom", e => d3.select("#zoom-g").attr("transform", e.transform));
+        svg.call(zoomBehavior);
+      }
+
+      function initializeSVG(margin) {
+        const zoomG = d3.select("#zoom-g");
+        zoomG.select("#tree-g").remove();
+        return zoomG.append("g")
+          .attr("id", "tree-g")
           .attr("transform", `translate(${margin.left},${margin.top})`);
       }
 
@@ -204,8 +217,8 @@
       }
 
       function update(prebuilt) {
-        const { nodes, margin, width, height } = prebuilt || buildHierarchy();
-        const g = initializeSVG(margin, width, height);
+        const { nodes, margin } = prebuilt || buildHierarchy();
+        const g = initializeSVG(margin);
         if (!selectedNodeData) selectedNodeData = nodes.descendants()[0].data;
         drawLinks(g, nodes);
         drawNodes(g, nodes);
@@ -262,9 +275,13 @@
         document.body.style.filter = inverted ? "invert(1)" : "invert(0)";
       }
 
+      setupZoom();
       fetchTreeData();
 
-      window.addEventListener('resize', () => { if (treeData) update(); });
+      window.addEventListener('resize', () => {
+        d3.select("svg").attr("width", window.innerWidth).attr("height", window.innerHeight);
+        if (treeData) update();
+      });
 
       window.addEventListener('keydown', (event) => {
         if (!treeData) return;
@@ -351,6 +368,10 @@
             break;
           case 'c':
             toggleColors();
+            dirty = false;
+            break;
+          case 'z':
+            d3.select("svg").call(zoomBehavior.transform, d3.zoomIdentity);
             dirty = false;
             break;
           case '?':
