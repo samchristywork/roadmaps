@@ -232,9 +232,27 @@
       function fetchTreeData() {
         document.title = idParam;
         fetch('/data/' + idParam + '.json?rand=' + Math.random())
-          .then(r => r.json())
-          .then(data => { treeData = data; document.title = data.name || idParam; update(); })
-          .catch(() => { treeData = { name: "Root", children: [] }; update(); });
+          .then(r => {
+            if (r.status === 404) {
+              treeData = { name: idParam, children: [] };
+              document.title = idParam;
+              showToast('New tree', true);
+              update();
+              return;
+            }
+            if (!r.ok) throw new Error(`Server error ${r.status}`);
+            return r.json().then(data => {
+              treeData = data;
+              document.title = data.name || idParam;
+              update();
+            });
+          })
+          .catch(err => {
+            document.body.insertAdjacentHTML('afterbegin',
+              `<p style="position:fixed;top:0;left:0;right:0;padding:0.75rem;background:#dc3545;color:white;font-family:monospace;z-index:9999">
+                Failed to load tree: ${err.message}
+              </p>`);
+          });
       }
 
       let inverted = false;
