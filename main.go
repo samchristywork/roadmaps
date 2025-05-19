@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -41,6 +42,11 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Error reading request body", http.StatusBadRequest)
+		return
+	}
+
+	if !json.Valid(body) {
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
 
