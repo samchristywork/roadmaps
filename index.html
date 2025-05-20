@@ -123,6 +123,7 @@
         <tr><td><kbd>k</kbd></td><td>prev sibling</td></tr>
         <tr><td><kbd>i</kbd></td><td>insert child</td></tr>
         <tr><td><kbd>o</kbd></td><td>insert sibling below</td></tr>
+        <tr><td><kbd>O</kbd></td><td>insert sibling above</td></tr>
         <tr><td><kbd>r</kbd></td><td>rename</td></tr>
         <tr><td><kbd>x</kbd></td><td>delete node</td></tr>
         <tr><td><kbd>-</kbd></td><td>collapse/expand</td></tr>
@@ -391,6 +392,20 @@
               if (!parentData.children) parentData.children = [];
               const idx = parentData.children.indexOf(sel.data);
               const insertAt = idx === -1 ? parentData.children.length : idx + 1;
+              parentData.children.splice(insertAt, 0, { name });
+              dataChanged = true;
+            } else { dirty = false; }
+            break;
+          }
+          case 'O': {
+            if (!sel.parent) { alert("Cannot add sibling to root."); dirty = false; break; }
+            const name = prompt("New sibling node name:");
+            if (name) {
+              snapshot();
+              const parentData = sel.parent.data;
+              if (!parentData.children) parentData.children = [];
+              const idx = parentData.children.indexOf(sel.data);
+              const insertAt = idx === -1 ? 0 : idx;
               parentData.children.splice(insertAt, 0, { name });
               dataChanged = true;
             } else { dirty = false; }
