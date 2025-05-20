@@ -44,6 +44,10 @@
       stroke-width: 4px !important;
     }
 
+    .collapsed-node {
+      stroke-dasharray: 5 3;
+    }
+
     svg {
       width: 99vw;
       height: 99vh;
@@ -121,6 +125,7 @@
         <tr><td><kbd>o</kbd></td><td>insert sibling below</td></tr>
         <tr><td><kbd>r</kbd></td><td>rename</td></tr>
         <tr><td><kbd>x</kbd></td><td>delete node</td></tr>
+        <tr><td><kbd>-</kbd></td><td>collapse/expand</td></tr>
         <tr><td><kbd>t</kbd></td><td>toggle done</td></tr>
         <tr><td><kbd>u</kbd></td><td>undo</td></tr>
         <tr><td><kbd>U</kbd></td><td>redo</td></tr>
@@ -137,6 +142,7 @@
       let idParam = params.get('id');
       let selectedNodeData = null;
       let unsaved = false;
+      const collapsed = new Set();
 
       const history = [], future = [];
 
@@ -218,7 +224,7 @@
         const width = window.innerWidth - margin.left - margin.right;
         const height = window.innerHeight - margin.top - margin.bottom;
         const treemap = d3.tree().size([height, width]);
-        return { nodes: treemap(d3.hierarchy(treeData)), margin, width, height };
+        return { nodes: treemap(d3.hierarchy(treeData, d => collapsed.has(d) ? null : d.children)), margin, width, height };
       }
 
       function drawLinks(g, nodes) {
@@ -246,7 +252,8 @@
           .attr("class", d => {
             const done = d.data.done ? "toggled" : "";
             const sel = d.data === selectedNodeData ? "selected-node" : "";
-            return [done, sel].filter(Boolean).join(" ");
+            const coll = collapsed.has(d.data) && d.data.children?.length ? "collapsed-node" : "";
+            return [done, sel, coll].filter(Boolean).join(" ");
           });
 
         node.append("text")
@@ -254,6 +261,14 @@
           .attr("x", 0)
           .style("text-anchor", "middle")
           .text(d => d.data.name);
+
+        node.append("text")
+          .attr("dy", "2em")
+          .attr("x", 0)
+          .style("text-anchor", "middle")
+          .style("font-size", "9px")
+          .style("fill", "#888")
+          .text(d => collapsed.has(d.data) && d.data.children?.length ? `+${d.data.children.length}` : "");
       }
 
       function update(prebuilt) {
@@ -407,6 +422,14 @@
             sel.data.done = !sel.data.done;
             dataChanged = true;
             break;
+          case '-': {
+            if (sel.data.children?.length) {
+              if (collapsed.has(sel.data)) collapsed.delete(sel.data);
+              else collapsed.add(sel.data);
+              dataChanged = true;
+            } else { dirty = false; }
+            break;
+          }
           case 'u': {
             if (history.length > 0) {
               future.push({ data: JSON.parse(JSON.stringify(treeData)), path: nodePath(selectedNodeData, treeData) });
