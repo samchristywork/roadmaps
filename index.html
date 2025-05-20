@@ -92,6 +92,37 @@
       font-size: 11px;
     }
 
+    .search-bar {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 5px 10px;
+      font-family: monospace;
+      font-size: 13px;
+    }
+
+    .search-bar.visible { display: flex; }
+
+    .search-bar input {
+      border: none;
+      outline: none;
+      font-family: monospace;
+      font-size: 13px;
+      width: 160px;
+    }
+
+    .search-bar .search-count {
+      color: #888;
+      font-size: 11px;
+      min-width: 3em;
+    }
+
     .toast {
       position: fixed;
       bottom: 20px;
@@ -114,6 +145,11 @@
   </head>
   <body>
     <svg></svg>
+    <div id="searchBar" class="search-bar">
+      <span>/</span>
+      <input id="searchInput" type="text" autocomplete="off" spellcheck="false">
+      <span id="searchCount" class="search-count"></span>
+    </div>
     <div id="toast" class="toast"></div>
     <div id="keybindings" class="keybindings">
       <table>
@@ -130,6 +166,8 @@
         <tr><td><kbd>t</kbd></td><td>toggle done</td></tr>
         <tr><td><kbd>u</kbd></td><td>undo</td></tr>
         <tr><td><kbd>U</kbd></td><td>redo</td></tr>
+        <tr><td><kbd>/</kbd></td><td>search nodes</td></tr>
+        <tr><td><kbd>n</kbd> <kbd>N</kbd></td><td>next/prev match</td></tr>
         <tr><td><kbd>s</kbd></td><td>save</td></tr>
         <tr><td><kbd>c</kbd></td><td>invert colors</td></tr>
         <tr><td><kbd>z</kbd></td><td>reset zoom</td></tr>
@@ -144,6 +182,58 @@
       let selectedNodeData = null;
       let unsaved = false;
       const collapsed = new Set();
+      let searchMatches = [];
+      let searchIndex = 0;
+
+      function allNodes(root) {
+        const result = [];
+        function walk(n) { result.push(n); (n.children || []).forEach(walk); }
+        walk(root);
+        return result;
+      }
+
+      function applySearch(term) {
+        if (!treeData || !term) { searchMatches = []; return; }
+        const lower = term.toLowerCase();
+        searchMatches = allNodes(treeData).filter(n => n.name.toLowerCase().includes(lower));
+        searchIndex = 0;
+        if (searchMatches.length) { selectedNodeData = searchMatches[0]; update(); }
+        document.getElementById('searchCount').textContent =
+          searchMatches.length ? `1/${searchMatches.length}` : 'no match';
+      }
+
+      function cycleSearch(delta) {
+        if (!searchMatches.length) return;
+        searchIndex = (searchIndex + delta + searchMatches.length) % searchMatches.length;
+        selectedNodeData = searchMatches[searchIndex];
+        document.getElementById('searchCount').textContent = `${searchIndex + 1}/${searchMatches.length}`;
+        update();
+      }
+
+      function openSearch() {
+        const bar = document.getElementById('searchBar');
+        const input = document.getElementById('searchInput');
+        input.value = '';
+        document.getElementById('searchCount').textContent = '';
+        searchMatches = [];
+        bar.classList.add('visible');
+        input.focus();
+      }
+
+      function closeSearch() {
+        document.getElementById('searchBar').classList.remove('visible');
+      }
+
+      document.getElementById('searchInput').addEventListener('input', e => {
+        applySearch(e.target.value);
+      });
+
+      document.getElementById('searchInput').addEventListener('keydown', e => {
+        if (e.key === 'Escape') { closeSearch(); e.preventDefault(); }
+        else if (e.key === 'Enter') { cycleSearch(1); e.preventDefault(); }
+        else if (e.key === 'n') { cycleSearch(1); e.preventDefault(); }
+        else if (e.key === 'N') { cycleSearch(-1); e.preventDefault(); }
+      });
 
       const history = [], future = [];
 
@@ -341,6 +431,11 @@
 
       window.addEventListener('keydown', (event) => {
         if (!treeData) return;
+        if (document.getElementById('searchBar').classList.contains('visible')) return;
+
+        if (event.key === '/') { event.preventDefault(); openSearch(); return; }
+        if (event.key === 'n') { cycleSearch(1); return; }
+        if (event.key === 'N') { cycleSearch(-1); return; }
 
         const built = buildHierarchy();
         const allNodes = built.nodes.descendants();
