@@ -161,7 +161,13 @@
         svg.append("g").attr("id", "zoom-g");
         zoomBehavior = d3.zoom()
           .scaleExtent([0.05, 4])
-          .on("zoom", e => d3.select("#zoom-g").attr("transform", e.transform));
+          .on("zoom", e => {
+            d3.select("#zoom-g").attr("transform", e.transform);
+            const { x, y, k } = e.transform;
+            const s = `${20*k}px ${20*k}px, ${20*k}px ${20*k}px, ${100*k}px ${100*k}px, ${100*k}px ${100*k}px`;
+            const p = `${x}px ${y}px`;
+            svg.style("background-size", s).style("background-position", p);
+          });
         svg.call(zoomBehavior);
       }
 
