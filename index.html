@@ -122,6 +122,8 @@
         <tr><td><kbd>r</kbd></td><td>rename</td></tr>
         <tr><td><kbd>x</kbd></td><td>delete node</td></tr>
         <tr><td><kbd>t</kbd></td><td>toggle done</td></tr>
+        <tr><td><kbd>u</kbd></td><td>undo</td></tr>
+        <tr><td><kbd>U</kbd></td><td>redo</td></tr>
         <tr><td><kbd>s</kbd></td><td>save</td></tr>
         <tr><td><kbd>c</kbd></td><td>invert colors</td></tr>
         <tr><td><kbd>z</kbd></td><td>reset zoom</td></tr>
@@ -135,6 +137,38 @@
       let idParam = params.get('id');
       let selectedNodeData = null;
       let unsaved = false;
+
+      const history = [], future = [];
+
+      function nodePath(nodeData, root) {
+        function search(cur, path) {
+          if (cur === nodeData) return path;
+          for (let i = 0; i < (cur.children || []).length; i++) {
+            const r = search(cur.children[i], [...path, i]);
+            if (r) return r;
+          }
+          return null;
+        }
+        return search(root, []) || [];
+      }
+
+      function nodeAtPath(root, path) {
+        let n = root;
+        for (const i of path) {
+          if (!n.children || !n.children[i]) return root;
+          n = n.children[i];
+        }
+        return n;
+      }
+
+      function snapshot() {
+        history.push({
+          data: JSON.parse(JSON.stringify(treeData)),
+          path: nodePath(selectedNodeData, treeData)
+        });
+        if (history.length > 100) history.shift();
+        future.length = 0;
+      }
 
       function markUnsaved() {
         if (unsaved) return;
@@ -326,6 +360,7 @@
           case 'i': {
             const name = prompt("New child node name:");
             if (name) {
+              snapshot();
               if (!sel.data.children) sel.data.children = [];
               sel.data.children.push({ name });
               dataChanged = true;
@@ -336,6 +371,7 @@
             if (!sel.parent) { alert("Cannot add sibling to root."); dirty = false; break; }
             const name = prompt("New sibling node name:");
             if (name) {
+              snapshot();
               const parentData = sel.parent.data;
               if (!parentData.children) parentData.children = [];
               const idx = parentData.children.indexOf(sel.data);
@@ -347,11 +383,12 @@
           }
           case 'r': {
             const newName = prompt("Rename node:", sel.data.name);
-            if (newName) { sel.data.name = newName; dataChanged = true; } else { dirty = false; }
+            if (newName) { snapshot(); sel.data.name = newName; dataChanged = true; } else { dirty = false; }
             break;
           }
           case 'x': {
             if (!sel.parent) { alert("Cannot delete root node."); dirty = false; break; }
+            snapshot();
             const parentData = sel.parent.data;
             parentData.children = parentData.children.filter(c => c !== sel.data);
             if (parentData.children.length === 0) delete parentData.children;
@@ -360,14 +397,36 @@
             break;
           }
           case 't':
+            snapshot();
             sel.data.done = !sel.data.done;
             dataChanged = true;
             break;
           case ' ':
             event.preventDefault();
+            snapshot();
             sel.data.done = !sel.data.done;
             dataChanged = true;
             break;
+          case 'u': {
+            if (history.length > 0) {
+              future.push({ data: JSON.parse(JSON.stringify(treeData)), path: nodePath(selectedNodeData, treeData) });
+              const prev = history.pop();
+              treeData = prev.data;
+              selectedNodeData = nodeAtPath(treeData, prev.path);
+              dataChanged = true;
+            } else { dirty = false; }
+            break;
+          }
+          case 'U': {
+            if (future.length > 0) {
+              history.push({ data: JSON.parse(JSON.stringify(treeData)), path: nodePath(selectedNodeData, treeData) });
+              const next = future.pop();
+              treeData = next.data;
+              selectedNodeData = nodeAtPath(treeData, next.path);
+              dataChanged = true;
+            } else { dirty = false; }
+            break;
+          }
           case 's':
             save();
             dirty = false;
