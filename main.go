@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"html"
 	"io"
 	"log"
 	"net/http"
@@ -61,6 +62,46 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Data saved successfully")
 }
 
+func treesHandler(w http.ResponseWriter, r *http.Request) {
+	entries, err := os.ReadDir("data")
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprintln(w, `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>Roadmaps</title>
+<style>
+  body { font-family: monospace; max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
+  h1 { font-size: 1.2rem; }
+  ul { list-style: none; padding: 0; }
+  li { margin: 0.4rem 0; }
+  a { color: #007bff; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .new { margin-top: 1.5rem; display: flex; gap: 0.5rem; }
+  .new input { font-family: monospace; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; }
+  .new button { padding: 4px 12px; cursor: pointer; }
+</style></head><body>
+<h1>Roadmaps</h1><ul>`)
+	if err == nil {
+		for _, e := range entries {
+			if !e.IsDir() && strings.HasSuffix(e.Name(), ".json") {
+				id := strings.TrimSuffix(e.Name(), ".json")
+				fmt.Fprintf(w, `<li><a href="/?id=%s">%s</a></li>`+"\n",
+					html.EscapeString(id), html.EscapeString(id))
+			}
+		}
+	}
+	fmt.Fprintln(w, `</ul>
+<div class="new">
+  <input id="newId" type="text" placeholder="new roadmap name">
+  <button onclick="go()">Create</button>
+</div>
+<script>
+  document.getElementById('newId').addEventListener('keydown', e => { if (e.key==='Enter') go(); });
+  function go() {
+    const id = document.getElementById('newId').value.trim();
+    if (id) window.location.href = '/?id=' + encodeURIComponent(id);
+  }
+</script></body></html>`)
+}
+
 func logRequest(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Requested URL: %s from %s", r.URL.Path, r.RemoteAddr)
@@ -77,6 +118,7 @@ func main() {
 	fs := http.FileServer(http.Dir("./data/"))
 	http.Handle("/data/", http.StripPrefix("/data", logRequest(fs)))
 
+	http.HandleFunc("/trees", treesHandler)
 	http.HandleFunc("/save", saveHandler)
 
 	log.Println("Starting server at :1235")
