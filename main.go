@@ -11,6 +11,9 @@ import (
 )
 
 func writeToFile(filename string, data []byte) error {
+	if err := os.MkdirAll("data", 0755); err != nil {
+		return err
+	}
 	file, err := os.Create(filename)
 	if err != nil {
 		return err
