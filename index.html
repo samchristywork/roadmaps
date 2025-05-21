@@ -273,6 +273,27 @@
       let searchMatches = [];
       let searchIndex = 0;
 
+      function parseIndentedTree(text) {
+        const lines = text.replace(/\t/g, '  ').split('\n')
+          .map(line => ({ indent: line.match(/^(\s*)/)[1].length, name: line.trim() }))
+          .filter(line => line.name !== '');
+        if (lines.length === 0) return [];
+        const roots = [];
+        const stack = [{ indent: -1, nodeArray: roots }];
+        for (const { indent, name } of lines) {
+          while (stack.length > 1 && stack[stack.length - 1].indent >= indent) stack.pop();
+          const node = { name };
+          stack[stack.length - 1].nodeArray.push(node);
+          stack.push({ indent, nodeArray: (node.children = []) });
+        }
+        function clean(node) {
+          if (node.children && node.children.length === 0) delete node.children;
+          else if (node.children) node.children.forEach(clean);
+        }
+        roots.forEach(clean);
+        return roots;
+      }
+
       function allNodes(root) {
         const result = [];
         function walk(n) { result.push(n); (n.children || []).forEach(walk); }
