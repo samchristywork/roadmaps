@@ -147,6 +147,66 @@
 
     .progress a:hover { text-decoration: underline; }
 
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.visible { display: flex; }
+
+    .modal {
+      background: white;
+      border-radius: 6px;
+      padding: 16px;
+      width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-family: monospace;
+      font-size: 13px;
+    }
+
+    .modal label { color: #555; }
+
+    .modal textarea {
+      font-family: monospace;
+      font-size: 13px;
+      resize: vertical;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 6px 8px;
+      height: 180px;
+      outline: none;
+    }
+
+    .modal textarea:focus { border-color: #007bff; }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .modal-buttons button {
+      padding: 5px 14px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      background: white;
+      font-family: monospace;
+      cursor: pointer;
+    }
+
+    .modal-buttons button.primary {
+      background: #007bff;
+      color: white;
+      border-color: #007bff;
+    }
+
     .toast {
       position: fixed;
       bottom: 20px;
