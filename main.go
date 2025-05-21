@@ -111,6 +111,10 @@ func logRequest(handler http.Handler) http.Handler {
 
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query().Get("id") == "" {
+			http.Redirect(w, r, "/trees", http.StatusFound)
+			return
+		}
 		log.Printf("Serving index.html to %s", r.RemoteAddr)
 		http.ServeFile(w, r, "index.html")
 	})
