@@ -207,6 +207,17 @@
       border-color: #007bff;
     }
 
+    .modal input[type=text] {
+      font-family: monospace;
+      font-size: 13px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 6px 8px;
+      outline: none;
+    }
+
+    .modal input[type=text]:focus { border-color: #007bff; }
+
     .toast {
       position: fixed;
       bottom: 20px;
@@ -237,6 +248,16 @@
     <div id="progress" class="progress">
       <a href="/trees">← all trees</a>
       <span id="progressCount"></span>
+    </div>
+    <div id="inputOverlay" class="modal-overlay">
+      <div class="modal" style="width:320px">
+        <label id="inputLabel"></label>
+        <input id="inputField" type="text" autocomplete="off">
+        <div class="modal-buttons">
+          <button id="inputCancelBtn">Cancel</button>
+          <button id="inputConfirmBtn" class="primary">OK  (Enter)</button>
+        </div>
+      </div>
     </div>
     <div id="pasteOverlay" class="modal-overlay">
       <div class="modal">
@@ -406,6 +427,39 @@
       document.getElementById('pasteText').addEventListener('keydown', e => {
         if (e.key === 'Escape') { closePasteModal(); e.preventDefault(); }
         else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { confirmPaste(); e.preventDefault(); }
+      });
+
+      let inputCallback = null;
+
+      function openInputModal(label, defaultValue, onConfirm) {
+        inputCallback = onConfirm;
+        document.getElementById('inputLabel').textContent = label;
+        const field = document.getElementById('inputField');
+        field.value = defaultValue || '';
+        document.getElementById('inputOverlay').classList.add('visible');
+        field.focus();
+        field.select();
+      }
+
+      function closeInputModal() {
+        document.getElementById('inputOverlay').classList.remove('visible');
+        inputCallback = null;
+      }
+
+      function confirmInput() {
+        const value = document.getElementById('inputField').value.trim();
+        if (value && inputCallback) inputCallback(value);
+        closeInputModal();
+      }
+
+      document.getElementById('inputConfirmBtn').addEventListener('click', confirmInput);
+      document.getElementById('inputCancelBtn').addEventListener('click', closeInputModal);
+      document.getElementById('inputOverlay').addEventListener('click', e => {
+        if (e.target === document.getElementById('inputOverlay')) closeInputModal();
+      });
+      document.getElementById('inputField').addEventListener('keydown', e => {
+        if (e.key === 'Enter') { confirmInput(); e.preventDefault(); }
+        else if (e.key === 'Escape') { closeInputModal(); e.preventDefault(); }
       });
 
       const history = [], future = [];
@@ -610,6 +664,7 @@
         if (!treeData) return;
         if (document.getElementById('searchBar').classList.contains('visible')) return;
         if (document.getElementById('pasteOverlay').classList.contains('visible')) return;
+        if (document.getElementById('inputOverlay').classList.contains('visible')) return;
 
         if (event.key === '/') { event.preventDefault(); openSearch(); return; }
         if (event.key === 'n') { cycleSearch(1); return; }
@@ -647,41 +702,40 @@
             break;
           }
           case 'i': {
-            const name = prompt("New child node name:");
-            if (name) {
+            const iData = sel.data;
+            openInputModal("New child node name:", "", name => {
               snapshot();
-              if (!sel.data.children) sel.data.children = [];
-              sel.data.children.push({ name });
-              dataChanged = true;
-            } else { dirty = false; }
+              if (!iData.children) iData.children = [];
+              iData.children.push({ name });
+              markUnsaved(); update();
+            });
+            dirty = false;
             break;
           }
           case 'o': {
-            if (!sel.parent) { alert("Cannot add sibling to root."); dirty = false; break; }
-            const name = prompt("New sibling node name:");
-            if (name) {
+            if (!sel.parent) { showToast("Cannot add sibling to root", false); dirty = false; break; }
+            const oParent = sel.parent.data, oSel = sel.data;
+            openInputModal("New sibling node name (below):", "", name => {
               snapshot();
-              const parentData = sel.parent.data;
-              if (!parentData.children) parentData.children = [];
-              const idx = parentData.children.indexOf(sel.data);
-              const insertAt = idx === -1 ? parentData.children.length : idx + 1;
-              parentData.children.splice(insertAt, 0, { name });
-              dataChanged = true;
-            } else { dirty = false; }
+              if (!oParent.children) oParent.children = [];
+              const idx = oParent.children.indexOf(oSel);
+              oParent.children.splice(idx === -1 ? oParent.children.length : idx + 1, 0, { name });
+              markUnsaved(); update();
+            });
+            dirty = false;
             break;
           }
           case 'O': {
-            if (!sel.parent) { alert("Cannot add sibling to root."); dirty = false; break; }
-            const name = prompt("New sibling node name:");
-            if (name) {
+            if (!sel.parent) { showToast("Cannot add sibling to root", false); dirty = false; break; }
+            const OParent = sel.parent.data, OSel = sel.data;
+            openInputModal("New sibling node name (above):", "", name => {
               snapshot();
-              const parentData = sel.parent.data;
-              if (!parentData.children) parentData.children = [];
-              const idx = parentData.children.indexOf(sel.data);
-              const insertAt = idx === -1 ? 0 : idx;
-              parentData.children.splice(insertAt, 0, { name });
-              dataChanged = true;
-            } else { dirty = false; }
+              if (!OParent.children) OParent.children = [];
+              const idx = OParent.children.indexOf(OSel);
+              OParent.children.splice(idx === -1 ? 0 : idx, 0, { name });
+              markUnsaved(); update();
+            });
+            dirty = false;
             break;
           }
           case 'p': {
@@ -690,12 +744,17 @@
             break;
           }
           case 'r': {
-            const newName = prompt("Rename node:", sel.data.name);
-            if (newName) { snapshot(); sel.data.name = newName; dataChanged = true; } else { dirty = false; }
+            const rData = sel.data;
+            openInputModal("Rename node:", rData.name, newName => {
+              snapshot();
+              rData.name = newName;
+              markUnsaved(); update();
+            });
+            dirty = false;
             break;
           }
           case 'x': {
-            if (!sel.parent) { alert("Cannot delete root node."); dirty = false; break; }
+            if (!sel.parent) { showToast("Cannot delete root node", false); dirty = false; break; }
             snapshot();
             const parentData = sel.parent.data;
             parentData.children = parentData.children.filter(c => c !== sel.data);
