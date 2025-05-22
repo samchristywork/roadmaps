@@ -44,6 +44,13 @@
       stroke-width: 4px !important;
     }
 
+    .cut-node {
+      stroke: #cc0000 !important;
+      stroke-width: 3px !important;
+      stroke-dasharray: 6 3 !important;
+      opacity: 0.6;
+    }
+
     .collapsed-node {
       stroke-dasharray: 5 3;
     }
@@ -299,7 +306,8 @@
         <tr><td><kbd>i</kbd></td><td>insert child</td></tr>
         <tr><td><kbd>o</kbd></td><td>insert sibling below</td></tr>
         <tr><td><kbd>O</kbd></td><td>insert sibling above</td></tr>
-        <tr><td><kbd>p</kbd></td><td>paste indented tree</td></tr>
+        <tr><td><kbd>m</kbd></td><td>mark node to move</td></tr>
+        <tr><td><kbd>p</kbd></td><td>paste (move marked / import tree)</td></tr>
         <tr><td><kbd>r</kbd></td><td>rename</td></tr>
         <tr><td><kbd>x</kbd></td><td>delete node</td></tr>
         <tr><td><kbd>-</kbd></td><td>collapse/expand</td></tr>
@@ -324,6 +332,15 @@
       const collapsed = new Set();
       let searchMatches = [];
       let searchIndex = 0;
+      let cutNode = null;
+
+      function isDescendantOf(ancestor, candidate) {
+        if (!ancestor.children) return false;
+        for (const c of ancestor.children) {
+          if (c === candidate || isDescendantOf(c, candidate)) return true;
+        }
+        return false;
+      }
 
       function parseIndentedTree(text) {
         const lines = text.replace(/\t/g, '  ').split('\n')
@@ -589,7 +606,8 @@
             const done = d.data.done ? "toggled" : "";
             const sel = d.data === selectedNodeData ? "selected-node" : "";
             const coll = collapsed.has(d.data) && d.data.children?.length ? "collapsed-node" : "";
-            return [done, sel, coll].filter(Boolean).join(" ");
+            const cut = cutNode && d.data === cutNode.data ? "cut-node" : "";
+            return [done, sel, coll, cut].filter(Boolean).join(" ");
           });
 
         node.append("text")
@@ -769,9 +787,28 @@
             dirty = false;
             break;
           }
+          case 'm': {
+            if (!sel.parent) { showToast("Cannot move root node", false); dirty = false; break; }
+            cutNode = { data: sel.data, parent: sel.parent.data };
+            showToast(`"${sel.data.name}" marked for move — press p to paste`, true);
+            break;
+          }
           case 'p': {
-            openPasteModal(sel.data);
-            dirty = false;
+            if (cutNode) {
+              if (sel.data === cutNode.data) { showToast("Cannot paste onto itself", false); dirty = false; break; }
+              if (isDescendantOf(cutNode.data, sel.data)) { showToast("Cannot paste onto a descendant", false); dirty = false; break; }
+              snapshot();
+              cutNode.parent.children = cutNode.parent.children.filter(c => c !== cutNode.data);
+              if (cutNode.parent.children.length === 0) delete cutNode.parent.children;
+              if (!sel.data.children) sel.data.children = [];
+              sel.data.children.push(cutNode.data);
+              selectedNodeData = cutNode.data;
+              cutNode = null;
+              dataChanged = true;
+            } else {
+              openPasteModal(sel.data);
+              dirty = false;
+            }
             break;
           }
           case 'r': {
@@ -819,6 +856,7 @@
               const prev = history.pop();
               treeData = prev.data;
               selectedNodeData = nodeAtPath(treeData, prev.path);
+              cutNode = null;
               dataChanged = true;
             } else { dirty = false; }
             break;
@@ -829,6 +867,7 @@
               const next = future.pop();
               treeData = next.data;
               selectedNodeData = nodeAtPath(treeData, next.path);
+              cutNode = null;
               dataChanged = true;
             } else { dirty = false; }
             break;
