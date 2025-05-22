@@ -306,6 +306,18 @@
         </div>
       </div>
     </div>
+    <div id="exportOverlay" class="modal-overlay">
+      <div class="modal" style="width:340px">
+        <label>Export tree as:</label>
+        <div class="modal-buttons" style="justify-content:flex-start;flex-wrap:wrap;gap:8px">
+          <button id="exportTxtBtn">Plain text (.txt)</button>
+          <button id="exportMdBtn">Markdown (.md)</button>
+        </div>
+        <div class="modal-buttons">
+          <button id="exportCancelBtn">Close</button>
+        </div>
+      </div>
+    </div>
     <div id="toast" class="toast"></div>
     <div id="keybindings" class="keybindings">
       <table>
@@ -327,6 +339,7 @@
         <tr><td><kbd>U</kbd></td><td>redo</td></tr>
         <tr><td><kbd>/</kbd></td><td>search nodes</td></tr>
         <tr><td><kbd>n</kbd> <kbd>N</kbd></td><td>next/prev match</td></tr>
+        <tr><td><kbd>E</kbd></td><td>export tree</td></tr>
         <tr><td><kbd>s</kbd></td><td>save</td></tr>
         <tr><td><kbd>c</kbd></td><td>invert colors</td></tr>
         <tr><td><kbd>z</kbd></td><td>reset zoom</td></tr>
@@ -751,6 +764,41 @@
           });
       }
 
+      function generateTextOutline(node, depth) {
+        let out = '  '.repeat(depth) + node.name + '\n';
+        if (node.children) node.children.forEach(c => { out += generateTextOutline(c, depth + 1); });
+        return out;
+      }
+
+      function generateMarkdown(node, depth) {
+        const check = node.done ? '[x]' : '[ ]';
+        let out = '  '.repeat(depth) + `- ${check} ${node.name}\n`;
+        if (node.children) node.children.forEach(c => { out += generateMarkdown(c, depth + 1); });
+        return out;
+      }
+
+      function downloadText(text, filename) {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }
+
+      document.getElementById('exportTxtBtn').addEventListener('click', () => {
+        downloadText(generateTextOutline(treeData, 0), `${idParam || 'roadmap'}.txt`);
+      });
+      document.getElementById('exportMdBtn').addEventListener('click', () => {
+        downloadText(generateMarkdown(treeData, 0), `${idParam || 'roadmap'}.md`);
+      });
+      document.getElementById('exportCancelBtn').addEventListener('click', () => {
+        document.getElementById('exportOverlay').classList.remove('visible');
+      });
+      document.getElementById('exportOverlay').addEventListener('click', e => {
+        if (e.target === document.getElementById('exportOverlay'))
+          document.getElementById('exportOverlay').classList.remove('visible');
+      });
+
       let inverted = false;
       function toggleColors() {
         inverted = !inverted;
@@ -772,6 +820,7 @@
         if (document.getElementById('pasteOverlay').classList.contains('visible')) return;
         if (document.getElementById('inputOverlay').classList.contains('visible')) return;
         if (document.getElementById('notesOverlay').classList.contains('visible')) return;
+        if (document.getElementById('exportOverlay').classList.contains('visible')) return;
 
         if (event.key === '/') { event.preventDefault(); openSearch(); return; }
         if (event.key === 'n') { cycleSearch(1); return; }
@@ -935,6 +984,10 @@
             } else { dirty = false; }
             break;
           }
+          case 'E':
+            document.getElementById('exportOverlay').classList.add('visible');
+            dirty = false;
+            break;
           case 's':
             save();
             dirty = false;
