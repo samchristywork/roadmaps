@@ -238,6 +238,16 @@
       <a href="/trees">← all trees</a>
       <span id="progressCount"></span>
     </div>
+    <div id="pasteOverlay" class="modal-overlay">
+      <div class="modal">
+        <label>Paste indented tree (Tab or spaces for children):</label>
+        <textarea id="pasteText" spellcheck="false" placeholder="root node&#10;  child one&#10;  child two&#10;    grandchild"></textarea>
+        <div class="modal-buttons">
+          <button id="pasteCancelBtn">Cancel</button>
+          <button id="pasteConfirmBtn" class="primary">Import  (Ctrl+Enter)</button>
+        </div>
+      </div>
+    </div>
     <div id="toast" class="toast"></div>
     <div id="keybindings" class="keybindings">
       <table>
@@ -248,6 +258,7 @@
         <tr><td><kbd>i</kbd></td><td>insert child</td></tr>
         <tr><td><kbd>o</kbd></td><td>insert sibling below</td></tr>
         <tr><td><kbd>O</kbd></td><td>insert sibling above</td></tr>
+        <tr><td><kbd>p</kbd></td><td>paste indented tree</td></tr>
         <tr><td><kbd>r</kbd></td><td>rename</td></tr>
         <tr><td><kbd>x</kbd></td><td>delete node</td></tr>
         <tr><td><kbd>-</kbd></td><td>collapse/expand</td></tr>
@@ -342,6 +353,43 @@
         else if (e.key === 'Enter') { cycleSearch(1); e.preventDefault(); }
         else if (e.key === 'n') { cycleSearch(1); e.preventDefault(); }
         else if (e.key === 'N') { cycleSearch(-1); e.preventDefault(); }
+      });
+
+      let pasteTargetData = null;
+
+      function openPasteModal(targetData) {
+        pasteTargetData = targetData;
+        const overlay = document.getElementById('pasteOverlay');
+        document.getElementById('pasteText').value = '';
+        overlay.classList.add('visible');
+        document.getElementById('pasteText').focus();
+      }
+
+      function closePasteModal() {
+        document.getElementById('pasteOverlay').classList.remove('visible');
+        pasteTargetData = null;
+      }
+
+      function confirmPaste() {
+        const text = document.getElementById('pasteText').value;
+        const parsed = parseIndentedTree(text);
+        if (parsed.length === 0) { showToast('Nothing to import', false); return; }
+        snapshot();
+        if (!pasteTargetData.children) pasteTargetData.children = [];
+        pasteTargetData.children.push(...parsed);
+        markUnsaved();
+        update();
+        closePasteModal();
+      }
+
+      document.getElementById('pasteConfirmBtn').addEventListener('click', confirmPaste);
+      document.getElementById('pasteCancelBtn').addEventListener('click', closePasteModal);
+      document.getElementById('pasteOverlay').addEventListener('click', e => {
+        if (e.target === document.getElementById('pasteOverlay')) closePasteModal();
+      });
+      document.getElementById('pasteText').addEventListener('keydown', e => {
+        if (e.key === 'Escape') { closePasteModal(); e.preventDefault(); }
+        else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { confirmPaste(); e.preventDefault(); }
       });
 
       const history = [], future = [];
@@ -545,6 +593,7 @@
       window.addEventListener('keydown', (event) => {
         if (!treeData) return;
         if (document.getElementById('searchBar').classList.contains('visible')) return;
+        if (document.getElementById('pasteOverlay').classList.contains('visible')) return;
 
         if (event.key === '/') { event.preventDefault(); openSearch(); return; }
         if (event.key === 'n') { cycleSearch(1); return; }
@@ -617,6 +666,11 @@
               parentData.children.splice(insertAt, 0, { name });
               dataChanged = true;
             } else { dirty = false; }
+            break;
+          }
+          case 'p': {
+            openPasteModal(sel.data);
+            dirty = false;
             break;
           }
           case 'r': {
