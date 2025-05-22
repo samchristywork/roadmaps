@@ -312,6 +312,7 @@
         <div class="modal-buttons" style="justify-content:flex-start;flex-wrap:wrap;gap:8px">
           <button id="exportTxtBtn">Plain text (.txt)</button>
           <button id="exportMdBtn">Markdown (.md)</button>
+          <button id="exportJsonBtn">JSON (.json)</button>
         </div>
         <div class="modal-buttons">
           <button id="exportCancelBtn">Close</button>
@@ -790,6 +791,9 @@
       });
       document.getElementById('exportMdBtn').addEventListener('click', () => {
         downloadText(generateMarkdown(treeData, 0), `${idParam || 'roadmap'}.md`);
+      });
+      document.getElementById('exportJsonBtn').addEventListener('click', () => {
+        downloadText(JSON.stringify(treeData, null, 2), `${idParam || 'roadmap'}.json`);
       });
       document.getElementById('exportCancelBtn').addEventListener('click', () => {
         document.getElementById('exportOverlay').classList.remove('visible');
