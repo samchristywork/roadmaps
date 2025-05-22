@@ -296,6 +296,16 @@
         </div>
       </div>
     </div>
+    <div id="notesOverlay" class="modal-overlay">
+      <div class="modal">
+        <label id="notesLabel">Node notes:</label>
+        <textarea id="notesText" spellcheck="true" placeholder="Add notes for this node…"></textarea>
+        <div class="modal-buttons">
+          <button id="notesCancelBtn">Cancel</button>
+          <button id="notesConfirmBtn" class="primary">Save  (Ctrl+Enter)</button>
+        </div>
+      </div>
+    </div>
     <div id="toast" class="toast"></div>
     <div id="keybindings" class="keybindings">
       <table>
@@ -308,6 +318,7 @@
         <tr><td><kbd>O</kbd></td><td>insert sibling above</td></tr>
         <tr><td><kbd>m</kbd></td><td>mark node to move</td></tr>
         <tr><td><kbd>p</kbd></td><td>paste (move marked / import tree)</td></tr>
+        <tr><td><kbd>e</kbd></td><td>edit node notes</td></tr>
         <tr><td><kbd>r</kbd></td><td>rename</td></tr>
         <tr><td><kbd>x</kbd></td><td>delete node</td></tr>
         <tr><td><kbd>-</kbd></td><td>collapse/expand</td></tr>
@@ -462,6 +473,42 @@
       document.getElementById('pasteText').addEventListener('keydown', e => {
         if (e.key === 'Escape') { closePasteModal(); e.preventDefault(); }
         else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { confirmPaste(); e.preventDefault(); }
+      });
+
+      let notesTargetData = null;
+
+      function openNotesModal(nodeData) {
+        notesTargetData = nodeData;
+        document.getElementById('notesLabel').textContent = `Notes for "${nodeData.name}":`;
+        document.getElementById('notesText').value = nodeData.notes || '';
+        document.getElementById('notesOverlay').classList.add('visible');
+        document.getElementById('notesText').focus();
+      }
+
+      function closeNotesModal() {
+        document.getElementById('notesOverlay').classList.remove('visible');
+        notesTargetData = null;
+      }
+
+      function confirmNotes() {
+        if (!notesTargetData) return;
+        snapshot();
+        const val = document.getElementById('notesText').value.trim();
+        if (val) notesTargetData.notes = val;
+        else delete notesTargetData.notes;
+        markUnsaved();
+        update();
+        closeNotesModal();
+      }
+
+      document.getElementById('notesConfirmBtn').addEventListener('click', confirmNotes);
+      document.getElementById('notesCancelBtn').addEventListener('click', closeNotesModal);
+      document.getElementById('notesOverlay').addEventListener('click', e => {
+        if (e.target === document.getElementById('notesOverlay')) closeNotesModal();
+      });
+      document.getElementById('notesText').addEventListener('keydown', e => {
+        if (e.key === 'Escape') { closeNotesModal(); e.preventDefault(); }
+        else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { confirmNotes(); e.preventDefault(); }
       });
 
       let inputCallback = null;
@@ -623,6 +670,16 @@
           .style("font-size", "9px")
           .style("fill", "#888")
           .text(d => collapsed.has(d.data) && d.data.children?.length ? `+${d.data.children.length}` : "");
+
+        node.filter(d => !!d.data.notes)
+          .append("circle")
+          .attr("r", 3)
+          .attr("cx", 8)
+          .attr("cy", -8)
+          .style("fill", "#007bff")
+          .style("stroke", "none")
+          .append("title")
+          .text(d => d.data.notes);
       }
 
       function update(prebuilt) {
@@ -714,6 +771,7 @@
         if (document.getElementById('searchBar').classList.contains('visible')) return;
         if (document.getElementById('pasteOverlay').classList.contains('visible')) return;
         if (document.getElementById('inputOverlay').classList.contains('visible')) return;
+        if (document.getElementById('notesOverlay').classList.contains('visible')) return;
 
         if (event.key === '/') { event.preventDefault(); openSearch(); return; }
         if (event.key === 'n') { cycleSearch(1); return; }
@@ -818,6 +876,11 @@
               rData.name = newName;
               markUnsaved(); update();
             });
+            dirty = false;
+            break;
+          }
+          case 'e': {
+            openNotesModal(sel.data);
             dirty = false;
             break;
           }
