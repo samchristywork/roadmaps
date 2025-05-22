@@ -243,6 +243,8 @@
         <label>Paste indented tree (Tab or spaces for children):</label>
         <textarea id="pasteText" spellcheck="false" placeholder="root node&#10;  child one&#10;  child two&#10;    grandchild"></textarea>
         <div class="modal-buttons">
+          <input id="fileInput" type="file" accept=".txt,.md" style="display:none">
+          <button id="uploadFileBtn">Upload file…</button>
           <button id="pasteCancelBtn">Cancel</button>
           <button id="pasteConfirmBtn" class="primary">Import  (Ctrl+Enter)</button>
         </div>
@@ -384,6 +386,20 @@
 
       document.getElementById('pasteConfirmBtn').addEventListener('click', confirmPaste);
       document.getElementById('pasteCancelBtn').addEventListener('click', closePasteModal);
+      document.getElementById('uploadFileBtn').addEventListener('click', () => {
+        document.getElementById('fileInput').click();
+      });
+      document.getElementById('fileInput').addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+          document.getElementById('pasteText').value = ev.target.result;
+          document.getElementById('pasteText').focus();
+        };
+        reader.readAsText(file);
+        e.target.value = '';
+      });
       document.getElementById('pasteOverlay').addEventListener('click', e => {
         if (e.target === document.getElementById('pasteOverlay')) closePasteModal();
       });
