@@ -968,6 +968,7 @@
             parentData.children = parentData.children.filter(c => c !== sel.data);
             if (parentData.children.length === 0) delete parentData.children;
             selectedNodeData = sel.parent.data;
+            if (cutNode && cutNode.data === sel.data) cutNode = null;
             dataChanged = true;
             break;
           }
