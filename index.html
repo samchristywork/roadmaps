@@ -777,10 +777,10 @@
             });
           })
           .catch(err => {
-            document.body.insertAdjacentHTML('afterbegin',
-              `<p style="position:fixed;top:0;left:0;right:0;padding:0.75rem;background:#dc3545;color:white;font-family:monospace;z-index:9999">
-                Failed to load tree: ${err.message}
-              </p>`);
+            const p = document.createElement('p');
+            p.style.cssText = 'position:fixed;top:0;left:0;right:0;padding:0.75rem;background:#dc3545;color:white;font-family:monospace;z-index:9999';
+            p.textContent = `Failed to load tree: ${err.message}`;
+            document.body.prepend(p);
           });
       }
 
