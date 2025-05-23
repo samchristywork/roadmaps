@@ -414,12 +414,23 @@
         return result;
       }
 
+      function expandToNode(target) {
+        function walk(node) {
+          if (node === target) return true;
+          for (const c of (node.children || [])) {
+            if (walk(c)) { collapsed.delete(node); return true; }
+          }
+          return false;
+        }
+        walk(treeData);
+      }
+
       function applySearch(term) {
         if (!treeData || !term) { searchMatches = []; return; }
         const lower = term.toLowerCase();
         searchMatches = allNodes(treeData).filter(n => n.name.toLowerCase().includes(lower));
         searchIndex = 0;
-        if (searchMatches.length) { selectedNodeData = searchMatches[0]; update(); }
+        if (searchMatches.length) { selectedNodeData = searchMatches[0]; expandToNode(searchMatches[0]); update(); }
         document.getElementById('searchCount').textContent =
           searchMatches.length ? `1/${searchMatches.length}` : 'no match';
       }
@@ -428,6 +439,7 @@
         if (!searchMatches.length) return;
         searchIndex = (searchIndex + delta + searchMatches.length) % searchMatches.length;
         selectedNodeData = searchMatches[searchIndex];
+        expandToNode(searchMatches[searchIndex]);
         document.getElementById('searchCount').textContent = `${searchIndex + 1}/${searchMatches.length}`;
         update();
       }
