@@ -754,7 +754,8 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(treeData, null, 2)
-        }).then(r => { if (r.ok) markSaved(); showToast(r.ok ? 'Saved' : 'Error saving', r.ok); });
+        }).then(r => { if (r.ok) markSaved(); showToast(r.ok ? 'Saved' : 'Error saving', r.ok); })
+          .catch(() => showToast('Error saving', false));
       }
 
       function fetchTreeData() {
