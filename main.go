@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 )
@@ -84,7 +85,7 @@ func treesHandler(w http.ResponseWriter, r *http.Request) {
 			if !e.IsDir() && strings.HasSuffix(e.Name(), ".json") {
 				id := strings.TrimSuffix(e.Name(), ".json")
 				fmt.Fprintf(w, `<li><a href="/?id=%s">%s</a></li>`+"\n",
-					html.EscapeString(id), html.EscapeString(id))
+					url.QueryEscape(id), html.EscapeString(id))
 			}
 		}
 	}
