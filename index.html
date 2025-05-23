@@ -323,9 +323,9 @@
     <div id="keybindings" class="keybindings">
       <table>
         <tr><td><kbd>h</kbd></td><td>go to parent</td></tr>
-        <tr><td><kbd>l</kbd></td><td>go to first child</td></tr>
         <tr><td><kbd>j</kbd></td><td>next sibling</td></tr>
         <tr><td><kbd>k</kbd></td><td>prev sibling</td></tr>
+        <tr><td><kbd>l</kbd></td><td>go to first child</td></tr>
         <tr><td><kbd>i</kbd></td><td>insert child</td></tr>
         <tr><td><kbd>o</kbd></td><td>insert sibling below</td></tr>
         <tr><td><kbd>O</kbd></td><td>insert sibling above</td></tr>
@@ -445,7 +445,7 @@
         const overlay = document.getElementById('pasteOverlay');
         document.getElementById('pasteText').value = '';
         overlay.classList.add('visible');
-        document.getElementById('pasteText').focus();
+        setTimeout(() => document.getElementById('pasteText').focus(), 0);
       }
 
       function closePasteModal() {
@@ -496,7 +496,7 @@
         document.getElementById('notesLabel').textContent = `Notes for "${nodeData.name}":`;
         document.getElementById('notesText').value = nodeData.notes || '';
         document.getElementById('notesOverlay').classList.add('visible');
-        document.getElementById('notesText').focus();
+        setTimeout(() => document.getElementById('notesText').focus(), 0);
       }
 
       function closeNotesModal() {
@@ -533,8 +533,7 @@
         const field = document.getElementById('inputField');
         field.value = defaultValue || '';
         document.getElementById('inputOverlay').classList.add('visible');
-        field.focus();
-        field.select();
+        setTimeout(() => { field.focus(); field.select(); }, 0);
       }
 
       function closeInputModal() {
