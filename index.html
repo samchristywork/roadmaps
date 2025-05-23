@@ -803,12 +803,17 @@
           document.getElementById('exportOverlay').classList.remove('visible');
       });
 
-      let inverted = false;
-      function toggleColors() {
-        inverted = !inverted;
+      let inverted = localStorage.getItem('darkMode') === '1';
+      function applyColors() {
         document.body.style.backgroundColor = inverted ? "black" : "white";
         document.body.style.filter = inverted ? "invert(1)" : "invert(0)";
       }
+      function toggleColors() {
+        inverted = !inverted;
+        localStorage.setItem('darkMode', inverted ? '1' : '0');
+        applyColors();
+      }
+      applyColors();
 
       setupZoom();
       fetchTreeData();
