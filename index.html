@@ -90,6 +90,18 @@
       padding: 2px 6px;
     }
 
+    .keybindings .section-header {
+      padding: 6px 6px 2px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #999;
+    }
+
+    .keybindings .section-header:first-child {
+      padding-top: 2px;
+    }
+
     .keybindings kbd {
       display: inline-block;
       padding: 1px 5px;
@@ -322,28 +334,35 @@
     <div id="toast" class="toast"></div>
     <div id="keybindings" class="keybindings">
       <table>
+        <tr><td colspan="2" class="section-header">Navigate</td></tr>
         <tr><td><kbd>h</kbd></td><td>go to parent</td></tr>
         <tr><td><kbd>j</kbd></td><td>next sibling</td></tr>
         <tr><td><kbd>k</kbd></td><td>prev sibling</td></tr>
         <tr><td><kbd>l</kbd></td><td>go to first child</td></tr>
+        <tr><td><kbd>/</kbd></td><td>search nodes</td></tr>
+        <tr><td><kbd>n</kbd> <kbd>N</kbd></td><td>next/prev match</td></tr>
+
+        <tr><td colspan="2" class="section-header">Edit</td></tr>
         <tr><td><kbd>i</kbd></td><td>insert child</td></tr>
         <tr><td><kbd>o</kbd></td><td>insert sibling below</td></tr>
         <tr><td><kbd>O</kbd></td><td>insert sibling above</td></tr>
-        <tr><td><kbd>m</kbd></td><td>mark node to move</td></tr>
-        <tr><td><kbd>p</kbd></td><td>paste (move marked / import tree)</td></tr>
-        <tr><td><kbd>e</kbd></td><td>edit node notes</td></tr>
         <tr><td><kbd>r</kbd></td><td>rename</td></tr>
-        <tr><td><kbd>x</kbd></td><td>delete node</td></tr>
-        <tr><td><kbd>-</kbd></td><td>collapse/expand</td></tr>
+        <tr><td><kbd>e</kbd></td><td>edit notes</td></tr>
         <tr><td><kbd>t</kbd></td><td>toggle done</td></tr>
+        <tr><td><kbd>-</kbd></td><td>collapse/expand</td></tr>
+        <tr><td><kbd>m</kbd></td><td>mark to move</td></tr>
+        <tr><td><kbd>p</kbd></td><td>paste / import tree</td></tr>
+        <tr><td><kbd>x</kbd></td><td>delete node</td></tr>
         <tr><td><kbd>u</kbd></td><td>undo</td></tr>
         <tr><td><kbd>U</kbd></td><td>redo</td></tr>
-        <tr><td><kbd>/</kbd></td><td>search nodes</td></tr>
-        <tr><td><kbd>n</kbd> <kbd>N</kbd></td><td>next/prev match</td></tr>
-        <tr><td><kbd>E</kbd></td><td>export tree</td></tr>
+
+        <tr><td colspan="2" class="section-header">File</td></tr>
         <tr><td><kbd>s</kbd></td><td>save</td></tr>
-        <tr><td><kbd>c</kbd></td><td>invert colors</td></tr>
+        <tr><td><kbd>E</kbd></td><td>export</td></tr>
+
+        <tr><td colspan="2" class="section-header">View</td></tr>
         <tr><td><kbd>z</kbd></td><td>reset zoom</td></tr>
+        <tr><td><kbd>c</kbd></td><td>invert colors</td></tr>
         <tr><td><kbd>?</kbd></td><td>toggle this panel</td></tr>
       </table>
     </div>
