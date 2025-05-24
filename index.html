@@ -301,7 +301,7 @@
         <label>Paste indented tree (Tab or spaces for children):</label>
         <textarea id="pasteText" spellcheck="false" placeholder="root node&#10;  child one&#10;  child two&#10;    grandchild"></textarea>
         <div class="modal-buttons">
-          <input id="fileInput" type="file" accept=".txt,.md" style="display:none">
+          <input id="fileInput" type="file" accept=".txt,.md,.json" style="display:none">
           <button id="uploadFileBtn">Upload file…</button>
           <button id="pasteCancelBtn">Cancel</button>
           <button id="pasteConfirmBtn" class="primary">Import  (Ctrl+Enter)</button>
@@ -509,8 +509,20 @@
         if (!file) return;
         const reader = new FileReader();
         reader.onload = ev => {
-          document.getElementById('pasteText').value = ev.target.result;
-          document.getElementById('pasteText').focus();
+          if (file.name.endsWith('.json')) {
+            let nodes;
+            try { nodes = JSON.parse(ev.target.result); } catch { showToast('Invalid JSON', false); return; }
+            const list = Array.isArray(nodes) ? nodes : [nodes];
+            snapshot();
+            if (!pasteTargetData.children) pasteTargetData.children = [];
+            pasteTargetData.children.push(...list);
+            markUnsaved();
+            update();
+            closePasteModal();
+          } else {
+            document.getElementById('pasteText').value = ev.target.result;
+            document.getElementById('pasteText').focus();
+          }
         };
         reader.readAsText(file);
         e.target.value = '';
