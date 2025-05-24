@@ -341,6 +341,7 @@
         <tr><td><kbd>l</kbd></td><td>go to first child</td></tr>
         <tr><td><kbd>/</kbd></td><td>search nodes</td></tr>
         <tr><td><kbd>n</kbd> <kbd>N</kbd></td><td>next/prev match</td></tr>
+        <tr><td><kbd>f</kbd></td><td>focus selected node</td></tr>
 
         <tr><td colspan="2" class="section-header">Edit</td></tr>
         <tr><td><kbd>i</kbd></td><td>insert child</td></tr>
@@ -637,6 +638,19 @@
       }
 
       let zoomBehavior;
+
+      function panToSelected() {
+        if (!selectedNodeData) return;
+        const built = buildHierarchy();
+        const selNode = built.nodes.descendants().find(n => n.data === selectedNodeData);
+        if (!selNode) return;
+        const { k } = d3.zoomTransform(d3.select("svg").node());
+        const nx = selNode.y + built.margin.left;
+        const ny = selNode.x + built.margin.top;
+        const tx = window.innerWidth / 2 - k * nx;
+        const ty = window.innerHeight / 2 - k * ny;
+        d3.select("svg").call(zoomBehavior.transform, d3.zoomIdentity.translate(tx, ty).scale(k));
+      }
 
       function setupZoom() {
         const svg = d3.select("svg")
@@ -1035,6 +1049,10 @@
             break;
           case 'c':
             toggleColors();
+            dirty = false;
+            break;
+          case 'f':
+            panToSelected();
             dirty = false;
             break;
           case 'z':
