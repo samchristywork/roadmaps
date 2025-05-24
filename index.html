@@ -826,6 +826,7 @@
 
       function generateTextOutline(node, depth) {
         let out = '  '.repeat(depth) + node.name + '\n';
+        if (node.notes) out += '  '.repeat(depth + 1) + `# ${node.notes}\n`;
         if (node.children) node.children.forEach(c => { out += generateTextOutline(c, depth + 1); });
         return out;
       }
@@ -833,6 +834,7 @@
       function generateMarkdown(node, depth) {
         const check = node.done ? '[x]' : '[ ]';
         let out = '  '.repeat(depth) + `- ${check} ${node.name}\n`;
+        if (node.notes) out += '  '.repeat(depth + 1) + `- _${node.notes}_\n`;
         if (node.children) node.children.forEach(c => { out += generateMarkdown(c, depth + 1); });
         return out;
       }
