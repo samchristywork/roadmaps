@@ -55,6 +55,34 @@ func deleteHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Deleted")
 }
 
+func renameHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	from := r.URL.Query().Get("from")
+	to := r.URL.Query().Get("to")
+	for _, id := range []string{from, to} {
+		if id == "" || strings.ContainsAny(id, "/\\") || strings.Contains(id, "..") {
+			http.Error(w, "Invalid id", http.StatusBadRequest)
+			return
+		}
+	}
+
+	if err := os.Rename("data/"+from+".json", "data/"+to+".json"); err != nil {
+		if os.IsNotExist(err) {
+			http.Error(w, "Not found", http.StatusNotFound)
+		} else {
+			http.Error(w, "Error renaming file", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintln(w, "Renamed")
+}
+
 func saveHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -100,8 +128,9 @@ func treesHandler(w http.ResponseWriter, r *http.Request) {
   li { margin: 0.4rem 0; display: flex; align-items: center; gap: 0.5rem; }
   a { color: #007bff; text-decoration: none; }
   a:hover { text-decoration: underline; }
-  .del { background: none; border: none; color: #aaa; cursor: pointer; font-size: 14px; padding: 0 4px; }
+  .del, .ren { background: none; border: none; color: #aaa; cursor: pointer; font-size: 14px; padding: 0 4px; }
   .del:hover { color: #dc3545; }
+  .ren:hover { color: #007bff; }
   .new { margin-top: 1.5rem; display: flex; gap: 0.5rem; }
   .new input { font-family: monospace; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; }
   .new button { padding: 4px 12px; cursor: pointer; }
@@ -111,8 +140,8 @@ func treesHandler(w http.ResponseWriter, r *http.Request) {
 		for _, e := range entries {
 			if !e.IsDir() && strings.HasSuffix(e.Name(), ".json") {
 				id := strings.TrimSuffix(e.Name(), ".json")
-				fmt.Fprintf(w, `<li><a href="/?id=%s">%s</a><button class="del" data-id="%s" onclick="del(this.dataset.id)" title="Delete">✕</button></li>`+"\n",
-					url.QueryEscape(id), html.EscapeString(id), html.EscapeString(id))
+				fmt.Fprintf(w, `<li><a href="/?id=%s">%s</a><button class="ren" data-id="%s" onclick="ren(this.dataset.id)" title="Rename">✎</button><button class="del" data-id="%s" onclick="del(this.dataset.id)" title="Delete">✕</button></li>`+"\n",
+					url.QueryEscape(id), html.EscapeString(id), html.EscapeString(id), html.EscapeString(id))
 			}
 		}
 	}
@@ -131,6 +160,12 @@ func treesHandler(w http.ResponseWriter, r *http.Request) {
     if (!confirm('Delete "' + id + '"?')) return;
     fetch('/delete?id=' + encodeURIComponent(id), { method: 'DELETE' })
       .then(r => { if (r.ok) location.reload(); else alert('Delete failed'); });
+  }
+  function ren(id) {
+    const to = prompt('Rename "' + id + '" to:', id);
+    if (!to || to === id) return;
+    fetch('/rename?from=' + encodeURIComponent(id) + '&to=' + encodeURIComponent(to), { method: 'POST' })
+      .then(r => { if (r.ok) location.reload(); else alert('Rename failed'); });
   }
 </script></body></html>`)
 }
@@ -158,6 +193,7 @@ func main() {
 	http.HandleFunc("/trees", treesHandler)
 	http.HandleFunc("/save", saveHandler)
 	http.HandleFunc("/delete", deleteHandler)
+	http.HandleFunc("/rename", renameHandler)
 
 	log.Println("Starting server at :1235")
 	if err := http.ListenAndServe(":1235", nil); err != nil {
