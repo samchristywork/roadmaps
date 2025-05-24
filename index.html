@@ -362,6 +362,8 @@
         <tr><td><kbd>E</kbd></td><td>export</td></tr>
 
         <tr><td colspan="2" class="section-header">View</td></tr>
+        <tr><td><kbd>[</kbd></td><td>collapse all</td></tr>
+        <tr><td><kbd>]</kbd></td><td>expand all</td></tr>
         <tr><td><kbd>z</kbd></td><td>reset zoom</td></tr>
         <tr><td><kbd>c</kbd></td><td>invert colors</td></tr>
         <tr><td><kbd>?</kbd></td><td>toggle this panel</td></tr>
@@ -881,10 +883,10 @@
         if (event.key === 'N') { cycleSearch(-1); return; }
 
         const built = buildHierarchy();
-        const allNodes = built.nodes.descendants();
-        if (!selectedNodeData) selectedNodeData = allNodes[0].data;
+        const descendants = built.nodes.descendants();
+        if (!selectedNodeData) selectedNodeData = descendants[0].data;
 
-        const sel = allNodes.find(n => n.data === selectedNodeData) || allNodes[0];
+        const sel = descendants.find(n => n.data === selectedNodeData) || descendants[0];
         let dirty = true;
         let dataChanged = false;
 
@@ -1054,6 +1056,14 @@
           case 'f':
             panToSelected();
             dirty = false;
+            break;
+          case '[':
+            allNodes(treeData).forEach(n => { if (n.children?.length) collapsed.add(n); });
+            dataChanged = true;
+            break;
+          case ']':
+            collapsed.clear();
+            dataChanged = true;
             break;
           case 'z':
             d3.select("svg").call(zoomBehavior.transform, d3.zoomIdentity);
