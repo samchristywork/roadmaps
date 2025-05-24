@@ -967,7 +967,7 @@
           case 'm': {
             if (!sel.parent) { showToast("Cannot move root node", false); dirty = false; break; }
             cutNode = { data: sel.data, parent: sel.parent.data };
-            showToast(`"${sel.data.name}" marked for move — press p to paste`, true);
+            showToast(`"${sel.data.name}" marked for move - press p to paste`, true);
             break;
           }
           case 'p': {
