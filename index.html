@@ -729,6 +729,12 @@
             const coll = collapsed.has(d.data) && d.data.children?.length ? "collapsed-node" : "";
             const cut = cutNode && d.data === cutNode.data ? "cut-node" : "";
             return [done, sel, coll, cut].filter(Boolean).join(" ");
+          })
+          .append("title")
+          .text(d => {
+            const sub = allNodes(d.data);
+            const doneCount = sub.filter(n => n.done).length;
+            return `${d.data.name}\n${doneCount} / ${sub.length} done`;
           });
 
         node.append("text")
