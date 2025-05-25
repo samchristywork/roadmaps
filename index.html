@@ -11,7 +11,13 @@
       padding: 0;
     }
 
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
     body {
+      display: flex;
       color: #333;
     }
 
@@ -56,8 +62,9 @@
     }
 
     svg {
-      width: 99vw;
-      height: 99vh;
+      flex: 1;
+      min-width: 0;
+      height: 100%;
       background-image:
         linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
         linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
@@ -71,15 +78,12 @@
     }
 
     .keybindings {
-      position: absolute;
-      top: 10px;
-      right: 10px;
       background: white;
       padding: 10px 14px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+      border-left: 1px solid #ccc;
       font-family: monospace;
       font-size: 12px;
+      overflow-y: auto;
     }
 
     .keybindings table {
@@ -663,15 +667,14 @@
         const { k } = d3.zoomTransform(d3.select("svg").node());
         const nx = selNode.y + built.margin.left;
         const ny = selNode.x + built.margin.top;
-        const tx = window.innerWidth / 2 - k * nx;
-        const ty = window.innerHeight / 2 - k * ny;
+        const svgEl = d3.select("svg").node();
+        const tx = svgEl.clientWidth / 2 - k * nx;
+        const ty = svgEl.clientHeight / 2 - k * ny;
         d3.select("svg").call(zoomBehavior.transform, d3.zoomIdentity.translate(tx, ty).scale(k));
       }
 
       function setupZoom() {
-        const svg = d3.select("svg")
-          .attr("width", window.innerWidth)
-          .attr("height", window.innerHeight);
+        const svg = d3.select("svg");
         svg.append("g").attr("id", "zoom-g");
         zoomBehavior = d3.zoom()
           .scaleExtent([0.05, 4])
@@ -695,8 +698,9 @@
 
       function buildHierarchy() {
         const margin = { top: 100, right: 200, bottom: 100, left: 200 };
-        const width = window.innerWidth - margin.left - margin.right;
-        const height = window.innerHeight - margin.top - margin.bottom;
+        const svgEl = d3.select("svg").node();
+        const width = svgEl.clientWidth - margin.left - margin.right;
+        const height = svgEl.clientHeight - margin.top - margin.bottom;
         const treemap = d3.tree().size([height, width]);
         return { nodes: treemap(d3.hierarchy(treeData, d => collapsed.has(d) ? null : d.children)), margin, width, height };
       }
@@ -888,7 +892,6 @@
       fetchTreeData();
 
       window.addEventListener('resize', () => {
-        d3.select("svg").attr("width", window.innerWidth).attr("height", window.innerHeight);
         if (treeData) update();
       });
 
