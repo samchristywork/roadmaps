@@ -815,7 +815,7 @@
 
       function save() {
         if (!treeData) return;
-        fetch('/save?id=' + idParam, {
+        fetch('/save?id=' + encodeURIComponent(idParam), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(treeData, null, 2)
@@ -825,7 +825,7 @@
 
       function fetchTreeData() {
         document.title = idParam;
-        fetch('/data/' + idParam + '.json?rand=' + Math.random())
+        fetch('/data/' + encodeURIComponent(idParam) + '.json?rand=' + Math.random())
           .then(r => {
             if (r.status === 404) {
               treeData = { name: idParam, children: [] };
