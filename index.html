@@ -351,6 +351,7 @@
         <tr><td><kbd>e</kbd></td><td>edit notes</td></tr>
         <tr><td><kbd>t</kbd></td><td>toggle done</td></tr>
         <tr><td><kbd>-</kbd></td><td>collapse/expand</td></tr>
+        <tr><td><kbd>d</kbd></td><td>duplicate node</td></tr>
         <tr><td><kbd>m</kbd></td><td>mark to move</td></tr>
         <tr><td><kbd>p</kbd></td><td>paste / import tree</td></tr>
         <tr><td><kbd>x</kbd></td><td>delete node</td></tr>
@@ -962,6 +963,17 @@
               markUnsaved(); update();
             });
             dirty = false;
+            break;
+          }
+          case 'd': {
+            if (!sel.parent) { showToast("Cannot duplicate root node", false); dirty = false; break; }
+            snapshot();
+            const copy = JSON.parse(JSON.stringify(sel.data));
+            const dParent = sel.parent.data;
+            const dIdx = dParent.children.indexOf(sel.data);
+            dParent.children.splice(dIdx + 1, 0, copy);
+            selectedNodeData = copy;
+            dataChanged = true;
             break;
           }
           case 'm': {
