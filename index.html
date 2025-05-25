@@ -355,6 +355,7 @@
         <tr><td><kbd>m</kbd></td><td>mark to move</td></tr>
         <tr><td><kbd>p</kbd></td><td>paste / import tree</td></tr>
         <tr><td><kbd>x</kbd></td><td>delete node</td></tr>
+        <tr><td><kbd>X</kbd></td><td>delete, promote children</td></tr>
         <tr><td><kbd>u</kbd></td><td>undo</td></tr>
         <tr><td><kbd>U</kbd></td><td>redo</td></tr>
 
@@ -1022,6 +1023,19 @@
             parentData.children = parentData.children.filter(c => c !== sel.data);
             if (parentData.children.length === 0) delete parentData.children;
             selectedNodeData = sel.parent.data;
+            if (cutNode && cutNode.data === sel.data) cutNode = null;
+            dataChanged = true;
+            break;
+          }
+          case 'X': {
+            if (!sel.parent) { showToast("Cannot delete root node", false); dirty = false; break; }
+            snapshot();
+            const xParent = sel.parent.data;
+            const xIdx = xParent.children.indexOf(sel.data);
+            const promoted = sel.data.children || [];
+            xParent.children.splice(xIdx, 1, ...promoted);
+            if (xParent.children.length === 0) delete xParent.children;
+            selectedNodeData = promoted.length ? promoted[0] : xParent;
             if (cutNode && cutNode.data === sel.data) cutNode = null;
             dataChanged = true;
             break;
