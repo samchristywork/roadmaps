@@ -371,6 +371,7 @@
         <tr><td><kbd>[</kbd></td><td>collapse all</td></tr>
         <tr><td><kbd>]</kbd></td><td>expand all</td></tr>
         <tr><td><kbd>z</kbd></td><td>reset zoom</td></tr>
+        <tr><td><kbd>q</kbd></td><td>toggle notes text</td></tr>
         <tr><td><kbd>c</kbd></td><td>invert colors</td></tr>
         <tr><td><kbd>?</kbd></td><td>toggle this panel</td></tr>
       </table>
@@ -386,6 +387,7 @@
       let searchMatches = [];
       let searchIndex = 0;
       let cutNode = null;
+      let showNotes = false;
 
       function isDescendantOf(ancestor, candidate) {
         if (!ancestor.children) return false;
@@ -764,6 +766,17 @@
           .style("stroke", "none")
           .append("title")
           .text(d => d.data.notes);
+
+        if (showNotes) {
+          node.filter(d => !!d.data.notes)
+            .append("text")
+            .attr("dy", "3.4em")
+            .attr("x", 0)
+            .style("text-anchor", "middle")
+            .style("font-size", "9px")
+            .style("fill", "#007bff")
+            .text(d => d.data.notes.length > 40 ? d.data.notes.slice(0, 40) + '…' : d.data.notes);
+        }
       }
 
       function update(prebuilt) {
@@ -1112,6 +1125,10 @@
             break;
           case ']':
             collapsed.clear();
+            dataChanged = true;
+            break;
+          case 'q':
+            showNotes = !showNotes;
             dataChanged = true;
             break;
           case 'z':
