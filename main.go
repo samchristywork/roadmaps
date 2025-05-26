@@ -118,6 +118,11 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 
 func treesHandler(w http.ResponseWriter, r *http.Request) {
 	entries, err := os.ReadDir("data")
+	if err != nil && !os.IsNotExist(err) {
+		log.Printf("Error reading data directory: %v", err)
+		http.Error(w, "Error reading roadmaps directory: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	fmt.Fprintln(w, `<!DOCTYPE html><html><head><meta charset="UTF-8">
 <title>Roadmaps</title>
@@ -136,13 +141,11 @@ func treesHandler(w http.ResponseWriter, r *http.Request) {
   .new button { padding: 4px 12px; cursor: pointer; }
 </style></head><body>
 <h1>Roadmaps</h1><ul>`)
-	if err == nil {
-		for _, e := range entries {
-			if !e.IsDir() && strings.HasSuffix(e.Name(), ".json") {
-				id := strings.TrimSuffix(e.Name(), ".json")
-				fmt.Fprintf(w, `<li><a href="/?id=%s">%s</a><button class="ren" data-id="%s" onclick="ren(this.dataset.id)" title="Rename">✎</button><button class="del" data-id="%s" onclick="del(this.dataset.id)" title="Delete">✕</button></li>`+"\n",
-					url.QueryEscape(id), html.EscapeString(id), html.EscapeString(id), html.EscapeString(id))
-			}
+	for _, e := range entries {
+		if !e.IsDir() && strings.HasSuffix(e.Name(), ".json") {
+			id := strings.TrimSuffix(e.Name(), ".json")
+			fmt.Fprintf(w, `<li><a href="/?id=%s">%s</a><button class="ren" data-id="%s" onclick="ren(this.dataset.id)" title="Rename">✎</button><button class="del" data-id="%s" onclick="del(this.dataset.id)" title="Delete">✕</button></li>`+"\n",
+				url.QueryEscape(id), html.EscapeString(id), html.EscapeString(id), html.EscapeString(id))
 		}
 	}
 	fmt.Fprintln(w, `</ul>
