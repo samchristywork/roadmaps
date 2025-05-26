@@ -789,6 +789,7 @@
         const all = allNodes(treeData);
         const done = all.filter(n => n.done).length;
         document.getElementById('progressCount').textContent = `${done} / ${all.length} done`;
+        document.title = (unsaved ? '* ' : '') + (treeData.name || idParam);
 
         if (selectedNodeData) {
           const path = nodePath(selectedNodeData, treeData);
