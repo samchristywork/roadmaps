@@ -634,10 +634,32 @@
         return n;
       }
 
+      function nodeAtPathSafe(root, path) {
+        let n = root;
+        for (const i of path) {
+          if (!n.children || !n.children[i]) return null;
+          n = n.children[i];
+        }
+        return n;
+      }
+
+      function collapsedPaths() {
+        return [...collapsed].map(n => nodePath(n, treeData));
+      }
+
+      function restoreCollapsed(paths) {
+        collapsed.clear();
+        for (const p of paths) {
+          const n = nodeAtPathSafe(treeData, p);
+          if (n) collapsed.add(n);
+        }
+      }
+
       function snapshot() {
         history.push({
           data: JSON.parse(JSON.stringify(treeData)),
-          path: nodePath(selectedNodeData, treeData)
+          path: nodePath(selectedNodeData, treeData),
+          collapsed: collapsedPaths()
         });
         if (history.length > 100) history.shift();
         future.length = 0;
@@ -1084,10 +1106,11 @@
           }
           case 'u': {
             if (history.length > 0) {
-              future.push({ data: JSON.parse(JSON.stringify(treeData)), path: nodePath(selectedNodeData, treeData) });
+              future.push({ data: JSON.parse(JSON.stringify(treeData)), path: nodePath(selectedNodeData, treeData), collapsed: collapsedPaths() });
               const prev = history.pop();
               treeData = prev.data;
               selectedNodeData = nodeAtPath(treeData, prev.path);
+              restoreCollapsed(prev.collapsed);
               cutNode = null;
               dataChanged = true;
             } else { dirty = false; }
@@ -1095,10 +1118,11 @@
           }
           case 'U': {
             if (future.length > 0) {
-              history.push({ data: JSON.parse(JSON.stringify(treeData)), path: nodePath(selectedNodeData, treeData) });
+              history.push({ data: JSON.parse(JSON.stringify(treeData)), path: nodePath(selectedNodeData, treeData), collapsed: collapsedPaths() });
               const next = future.pop();
               treeData = next.data;
               selectedNodeData = nodeAtPath(treeData, next.path);
+              restoreCollapsed(next.collapsed);
               cutNode = null;
               dataChanged = true;
             } else { dirty = false; }
