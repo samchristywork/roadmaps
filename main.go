@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"html"
 	"io"
@@ -181,6 +182,12 @@ func logRequest(handler http.Handler) http.Handler {
 }
 
 func main() {
+	port := flag.String("port", "1235", "port to listen on")
+	flag.Parse()
+	if p := os.Getenv("PORT"); p != "" {
+		*port = p
+	}
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("id") == "" {
 			http.Redirect(w, r, "/trees", http.StatusFound)
@@ -198,8 +205,8 @@ func main() {
 	http.HandleFunc("/delete", deleteHandler)
 	http.HandleFunc("/rename", renameHandler)
 
-	log.Println("Starting server at :1235")
-	if err := http.ListenAndServe(":1235", nil); err != nil {
+	log.Println("Starting server at :" + *port)
+	if err := http.ListenAndServe(":"+*port, nil); err != nil {
 		log.Fatal("Error starting server:", err)
 	}
 }
