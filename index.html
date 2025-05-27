@@ -830,6 +830,8 @@
       let toastTimer;
       function showToast(msg, ok) {
         const el = document.getElementById('toast');
+        const searchVisible = document.getElementById('searchBar').classList.contains('visible');
+        el.style.bottom = searchVisible ? '60px' : '20px';
         el.textContent = msg;
         el.className = `toast ${ok ? 'ok' : 'err'} visible`;
         clearTimeout(toastTimer);
