@@ -355,6 +355,7 @@
         <tr><td><kbd>e</kbd></td><td>edit notes</td></tr>
         <tr><td><kbd>t</kbd> <kbd>Space</kbd></td><td>toggle done</td></tr>
         <tr><td><kbd>-</kbd></td><td>collapse/expand</td></tr>
+        <tr><td><kbd>J</kbd> <kbd>K</kbd></td><td>move node down/up</td></tr>
         <tr><td><kbd>d</kbd></td><td>duplicate node</td></tr>
         <tr><td><kbd>m</kbd></td><td>mark to move</td></tr>
         <tr><td><kbd>p</kbd></td><td>paste / import tree</td></tr>
@@ -974,6 +975,28 @@
               const idx = siblings.indexOf(sel);
               if (idx > 0) selectedNodeData = siblings[idx - 1].data;
             }
+            break;
+          }
+          case 'J': {
+            if (!sel.parent) { dirty = false; break; }
+            const jSiblings = sel.parent.data.children;
+            const jIdx = jSiblings.indexOf(sel.data);
+            if (jIdx < jSiblings.length - 1) {
+              snapshot();
+              [jSiblings[jIdx], jSiblings[jIdx + 1]] = [jSiblings[jIdx + 1], jSiblings[jIdx]];
+              dataChanged = true;
+            } else { dirty = false; }
+            break;
+          }
+          case 'K': {
+            if (!sel.parent) { dirty = false; break; }
+            const kSiblings = sel.parent.data.children;
+            const kIdx = kSiblings.indexOf(sel.data);
+            if (kIdx > 0) {
+              snapshot();
+              [kSiblings[kIdx], kSiblings[kIdx - 1]] = [kSiblings[kIdx - 1], kSiblings[kIdx]];
+              dataChanged = true;
+            } else { dirty = false; }
             break;
           }
           case 'i': {
