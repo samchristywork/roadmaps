@@ -741,12 +741,13 @@
       }
 
       function buildHierarchy() {
-        const margin = { top: 100, right: 200, bottom: 100, left: 200 };
         const svgEl = d3.select("svg").node();
-        const width = svgEl.clientWidth - margin.left - margin.right;
-        const height = svgEl.clientHeight - margin.top - margin.bottom;
-        const treemap = d3.tree().size([height, width]);
-        return { nodes: treemap(d3.hierarchy(treeData, d => collapsed.has(d) ? null : d.children)), margin, width, height };
+        const margin = { top: svgEl.clientHeight / 2, right: 20, bottom: 20, left: 200 };
+        const treemap = d3.tree()
+          .nodeSize([22, 220])
+          .separation((a, b) => a.parent === b.parent ? 1 : 1.5);
+        const nodes = treemap(d3.hierarchy(treeData, d => collapsed.has(d) ? null : d.children));
+        return { nodes, margin };
       }
 
       function drawLinks(g, nodes) {
