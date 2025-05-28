@@ -816,13 +816,19 @@
 
         if (selectedNodeData) {
           const path = nodePath(selectedNodeData, treeData);
+          const crumbNodes = [treeData];
           let cur = treeData;
-          const labels = [cur.name];
-          for (const idx of path) {
-            cur = cur.children[idx];
-            labels.push(cur.name);
-          }
-          document.getElementById('breadcrumb').textContent = labels.join(' › ');
+          for (const idx of path) { cur = cur.children[idx]; crumbNodes.push(cur); }
+          const bc = document.getElementById('breadcrumb');
+          bc.innerHTML = '';
+          crumbNodes.forEach((n, i) => {
+            if (i > 0) { const sep = document.createTextNode(' › '); bc.appendChild(sep); }
+            const span = document.createElement('span');
+            span.textContent = n.name;
+            span.style.cssText = 'cursor:pointer;text-decoration:underline dotted;';
+            span.addEventListener('click', () => { selectedNodeData = n; update(); });
+            bc.appendChild(span);
+          });
         } else {
           document.getElementById('breadcrumb').textContent = '';
         }
