@@ -657,6 +657,17 @@
         }
       }
 
+      function saveCollapsedState() {
+        try { localStorage.setItem('collapsed:' + idParam, JSON.stringify(collapsedPaths())); } catch {}
+      }
+
+      function loadCollapsedState() {
+        try {
+          const raw = localStorage.getItem('collapsed:' + idParam);
+          if (raw) restoreCollapsed(JSON.parse(raw));
+        } catch {}
+      }
+
       function snapshot() {
         history.push({
           data: JSON.parse(JSON.stringify(treeData)),
@@ -833,6 +844,7 @@
         } else {
           document.getElementById('breadcrumb').textContent = '';
         }
+        saveCollapsedState();
       }
 
       let toastTimer;
@@ -864,6 +876,7 @@
               treeData = { name: idParam, children: [] };
               document.title = idParam;
               showToast('New tree', true);
+              loadCollapsedState();
               update();
               return;
             }
@@ -871,6 +884,7 @@
             return r.json().then(data => {
               treeData = data;
               document.title = data.name || idParam;
+              loadCollapsedState();
               update();
             });
           })
