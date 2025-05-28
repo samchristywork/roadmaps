@@ -388,6 +388,7 @@
       const collapsed = new Set();
       let searchMatches = [];
       let searchIndex = 0;
+      let searchTerm = '';
       let cutNode = null;
       let showNotes = false;
 
@@ -439,11 +440,13 @@
       }
 
       function applySearch(term) {
-        if (!treeData || !term) { searchMatches = []; return; }
+        searchTerm = term;
+        if (!treeData || !term) { searchMatches = []; update(); return; }
         const lower = term.toLowerCase();
         searchMatches = allNodes(treeData).filter(n => n.name.toLowerCase().includes(lower));
         searchIndex = 0;
         if (searchMatches.length) { selectedNodeData = searchMatches[0]; expandToNode(searchMatches[0]); update(); }
+        else { update(); }
         document.getElementById('searchCount').textContent =
           searchMatches.length ? `1/${searchMatches.length}` : 'no match';
       }
@@ -463,12 +466,16 @@
         input.value = '';
         document.getElementById('searchCount').textContent = '';
         searchMatches = [];
+        searchTerm = '';
         bar.classList.add('visible');
         input.focus();
       }
 
       function closeSearch() {
         document.getElementById('searchBar').classList.remove('visible');
+        searchTerm = '';
+        searchMatches = [];
+        update();
       }
 
       document.getElementById('searchInput').addEventListener('input', e => {
@@ -782,7 +789,19 @@
           .attr("dy", "-1.3em")
           .attr("x", 0)
           .style("text-anchor", "middle")
-          .text(d => d.data.name);
+          .each(function(d) {
+            const name = d.data.name;
+            const el = d3.select(this);
+            const lower = searchTerm ? searchTerm.toLowerCase() : '';
+            const idx = lower ? name.toLowerCase().indexOf(lower) : -1;
+            if (idx === -1 || !searchMatches.includes(d.data)) {
+              el.text(name);
+            } else {
+              if (idx > 0) el.append('tspan').text(name.slice(0, idx));
+              el.append('tspan').style('fill', '#e65c00').style('font-weight', 'bold').text(name.slice(idx, idx + searchTerm.length));
+              if (idx + searchTerm.length < name.length) el.append('tspan').text(name.slice(idx + searchTerm.length));
+            }
+          });
 
         node.append("text")
           .attr("dy", "2em")
