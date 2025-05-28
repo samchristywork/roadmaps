@@ -356,6 +356,7 @@
         <tr><td><kbd>t</kbd> <kbd>Space</kbd></td><td>toggle done</td></tr>
         <tr><td><kbd>-</kbd></td><td>collapse/expand</td></tr>
         <tr><td><kbd>J</kbd> <kbd>K</kbd></td><td>move node down/up</td></tr>
+        <tr><td><kbd>S</kbd></td><td>sort children A–Z</td></tr>
         <tr><td><kbd>d</kbd></td><td>duplicate node</td></tr>
         <tr><td><kbd>m</kbd></td><td>mark to move</td></tr>
         <tr><td><kbd>p</kbd></td><td>paste / import tree</td></tr>
@@ -1155,6 +1156,14 @@
               selectedNodeData = nodeAtPath(treeData, next.path);
               restoreCollapsed(next.collapsed);
               cutNode = null;
+              dataChanged = true;
+            } else { dirty = false; }
+            break;
+          }
+          case 'S': {
+            if (sel.data.children?.length) {
+              snapshot();
+              sel.data.children.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
               dataChanged = true;
             } else { dirty = false; }
             break;
