@@ -744,7 +744,7 @@
         const svgEl = d3.select("svg").node();
         const margin = { top: svgEl.clientHeight / 2, right: 20, bottom: 20, left: 200 };
         const treemap = d3.tree()
-          .nodeSize([22, 220])
+          .nodeSize([32, 260])
           .separation((a, b) => a.parent === b.parent ? 1 : 1.5);
         const nodes = treemap(d3.hierarchy(treeData, d => collapsed.has(d) ? null : d.children));
         return { nodes, margin };
