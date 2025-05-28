@@ -1,0 +1,248 @@
+{
+  "name": "American History Before 1776",
+  "children": [
+    {
+      "name": "Pre-Columbian America",
+      "children": [
+        {
+          "name": "Paleo-Indian Period (~15,000–8,000 BCE)",
+          "notes": "First peoples cross Beringia land bridge from Asia; spread throughout the Americas hunting megafauna such as mammoths and giant bison.",
+          "children": [
+            { "name": "Clovis Culture (~13,000 BCE)", "notes": "Characterized by distinctive fluted stone projectile points; considered one of the earliest widespread cultures in North America." },
+            { "name": "Folsom Culture (~10,000 BCE)", "notes": "Succeeded Clovis; specialized in hunting bison after megafauna extinction." }
+          ]
+        },
+        {
+          "name": "Archaic Period (~8,000–1,000 BCE)",
+          "notes": "Shift toward diverse subsistence strategies — hunting smaller game, fishing, and gathering plants as the climate warmed.",
+          "children": [
+            { "name": "Early Archaic (~8,000–6,000 BCE)" },
+            { "name": "Middle Archaic (~6,000–3,000 BCE)", "notes": "Evidence of semi-permanent settlements and trade networks." },
+            { "name": "Late Archaic (~3,000–1,000 BCE)", "notes": "Emergence of horticulture; construction of shell middens and early mound sites." }
+          ]
+        },
+        {
+          "name": "Woodland Period (~1,000 BCE–1,000 CE)",
+          "children": [
+            { "name": "Adena Culture (~1,000–100 BCE)", "notes": "Built large burial mounds in the Ohio Valley; known for elaborate funerary practices and trade goods." },
+            { "name": "Hopewell Culture (~100 BCE–500 CE)", "notes": "Sophisticated trade network spanning much of North America; monumental earthworks and rich burial goods." },
+            { "name": "Introduction of Maize Agriculture (~200 CE)", "notes": "Maize cultivation spreads northward from Mesoamerica, transforming subsistence patterns." }
+          ]
+        },
+        {
+          "name": "Major Regional Cultures",
+          "children": [
+            {
+              "name": "Mississippian Culture (~800–1600 CE)",
+              "notes": "Maize-based chiefdoms centered on large platform mounds; extensive trade and political networks.",
+              "children": [
+                { "name": "Cahokia (~1050–1350 CE)", "notes": "Largest pre-Columbian city north of Mexico, near present-day St. Louis; population estimated at 10,000–20,000." },
+                { "name": "Moundville (Alabama)", "notes": "Second largest Mississippian center; major ceremonial hub." },
+                { "name": "Etowah (Georgia)" }
+              ]
+            },
+            {
+              "name": "Ancestral Puebloans (~100–1300 CE)",
+              "notes": "Built multi-story stone and adobe structures in the Four Corners region.",
+              "children": [
+                { "name": "Chaco Canyon (~850–1150 CE)", "notes": "Regional center with great houses, roads, and astronomical alignments." },
+                { "name": "Mesa Verde (~600–1300 CE)", "notes": "Cliff dwellings constructed in canyon alcoves; abandoned around 1300 CE, possibly due to drought." }
+              ]
+            },
+            {
+              "name": "Eastern Woodland Peoples",
+              "children": [
+                { "name": "Haudenosaunee (Iroquois Confederacy)", "notes": "Alliance of five (later six) nations — Mohawk, Onondaga, Cayuga, Oneida, Seneca, and later Tuscarora; governed by the Great Law of Peace, which some historians argue influenced the U.S. Constitution." },
+                { "name": "Algonquian-speaking peoples", "notes": "Diverse nations including the Powhatan Confederacy, Wampanoag, Lenape, and Abenaki; inhabited the Atlantic seaboard." }
+              ]
+            },
+            {
+              "name": "Plains Peoples",
+              "children": [
+                { "name": "Pre-horse Plains cultures", "notes": "Mostly semi-sedentary river valley farmers and bison hunters on foot before European horses transformed Plains life." },
+                { "name": "Adoption of the horse (~1680 CE)", "notes": "Horses escaped or were traded from Spanish settlements; revolutionized Plains hunting and warfare." }
+              ]
+            },
+            {
+              "name": "Pacific Northwest Peoples",
+              "notes": "Abundant salmon runs supported complex, stratified societies without agriculture.",
+              "children": [
+                { "name": "Chinook" },
+                { "name": "Tlingit" },
+                { "name": "Haida" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Age of European Exploration",
+      "children": [
+        {
+          "name": "Norse Contact (~1000 CE)",
+          "children": [
+            { "name": "Leif Erikson reaches Vinland (~1000 CE)", "notes": "Norse settlement at L'Anse aux Meadows, Newfoundland — the only confirmed pre-Columbian European site in the Americas." }
+          ]
+        },
+        {
+          "name": "Spanish Exploration",
+          "children": [
+            { "name": "Christopher Columbus (1492)", "notes": "Sailing for Spain, Columbus lands in the Bahamas on October 12, 1492, initiating sustained contact between Europe and the Americas." },
+            { "name": "Treaty of Tordesillas (1494)", "notes": "Divided the non-European world between Spain and Portugal along a meridian 370 leagues west of the Cape Verde Islands." },
+            { "name": "Juan Ponce de León (1513)", "notes": "First European to reach mainland North America (Florida) while searching for the Fountain of Youth." },
+            { "name": "Hernán Cortés conquers Aztec Empire (1519–1521)", "notes": "Fall of Tenochtitlán opens Central America to Spanish colonization and fuels further North American exploration." },
+            { "name": "Hernando de Soto (1539–1542)", "notes": "Led the first major European expedition into the interior Southeast; his army spreads devastating disease among Native populations." },
+            { "name": "Francisco Vásquez de Coronado (1540–1542)", "notes": "Explored the American Southwest and Great Plains searching for the legendary Seven Cities of Gold." },
+            { "name": "St. Augustine founded (1565)", "notes": "Oldest continuously occupied European settlement in the present-day United States, established by Pedro Menéndez de Avilés." }
+          ]
+        },
+        {
+          "name": "French Exploration",
+          "children": [
+            { "name": "Giovanni da Verrazzano (1524)", "notes": "Sailing for France, explored the Atlantic coast from the Carolinas to Newfoundland." },
+            { "name": "Jacques Cartier (1534–1542)", "notes": "Explored the St. Lawrence River; claimed Canada for France." },
+            { "name": "Samuel de Champlain founds Quebec (1608)", "notes": "Established France's most important colonial foothold in North America." },
+            { "name": "Robert La Salle reaches mouth of Mississippi (1682)", "notes": "Claimed the entire Mississippi River basin for France, naming it Louisiana." }
+          ]
+        },
+        {
+          "name": "English Exploration",
+          "children": [
+            { "name": "John Cabot (1497)", "notes": "Sailing for England, Cabot reached Newfoundland or Nova Scotia, establishing England's claim to North America." },
+            { "name": "Martin Frobisher (1576–1578)", "notes": "Sought a Northwest Passage; explored Baffin Island." },
+            { "name": "Sir Francis Drake circumnavigates the globe (1577–1580)", "notes": "Plunders Spanish shipping and claims Nova Albion (California) for England." },
+            { "name": "Roanoke Colony (1585–1590)", "notes": "England's first attempt at permanent settlement in North America; the 'Lost Colony' disappeared with no definitive explanation." }
+          ]
+        },
+        {
+          "name": "Dutch Exploration",
+          "children": [
+            { "name": "Henry Hudson (1609)", "notes": "Sailing for the Dutch East India Company, Hudson explored the river bearing his name; his voyage led to Dutch settlement of New Netherland." }
+          ]
+        },
+        {
+          "name": "Columbian Exchange",
+          "notes": "Massive transfer of plants, animals, culture, human populations, and disease between the Americas and the Old World following Columbus's voyages.",
+          "children": [
+            { "name": "Old World to New World", "notes": "Horses, cattle, pigs, sheep, wheat, sugarcane, smallpox, measles, influenza." },
+            { "name": "New World to Old World", "notes": "Maize, potatoes, tomatoes, tobacco, cacao, syphilis (debated)." },
+            { "name": "Demographic catastrophe", "notes": "European diseases killed an estimated 50–90% of indigenous populations within a century of contact." }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Colonial Era",
+      "children": [
+        {
+          "name": "Spanish Colonial America",
+          "children": [
+            { "name": "Encomienda system", "notes": "Granted conquistadors the labor of indigenous peoples; backbone of early Spanish colonial economy." },
+            { "name": "New Mexico colony (1598)", "notes": "Juan de Oñate establishes Spanish presence in the Rio Grande valley." },
+            { "name": "Pueblo Revolt (1680)", "notes": "Pueblo peoples under Popé drive Spanish settlers out of New Mexico; Spain reconquers the region in 1692." },
+            { "name": "Spanish missions in California (1769)", "notes": "Franciscan friars, led by Junípero Serra, establish a chain of missions along the California coast." }
+          ]
+        },
+        {
+          "name": "French Colonial America",
+          "children": [
+            { "name": "New France", "notes": "Fur-trading empire stretching from Quebec through the Great Lakes and down the Mississippi; relied heavily on alliances with Native peoples." },
+            { "name": "Louisiana Territory claimed (1682)" },
+            { "name": "Detroit founded (1701)" },
+            { "name": "New Orleans founded (1718)" }
+          ]
+        },
+        {
+          "name": "British Colonies",
+          "children": [
+            {
+              "name": "Southern Colonies",
+              "children": [
+                { "name": "Virginia (1607)", "notes": "Jamestown — first permanent English settlement. Tobacco becomes the cash crop. House of Burgesses (1619) is the first representative assembly in the Americas." },
+                { "name": "Maryland (1634)", "notes": "Founded by Cecil Calvert as a refuge for English Catholics; Maryland Toleration Act (1649) grants religious tolerance." },
+                { "name": "Carolina (1663)", "notes": "Royal charter granted; splits into North and South Carolina in 1712." },
+                { "name": "Georgia (1732)", "notes": "Last of the original thirteen colonies; founded by James Oglethorpe as a buffer against Spanish Florida and a haven for debtors." }
+              ]
+            },
+            {
+              "name": "New England Colonies",
+              "children": [
+                { "name": "Plymouth Colony (1620)", "notes": "Pilgrim Separatists arrive on the Mayflower; Mayflower Compact is an early self-governance document. Plymouth eventually absorbed into Massachusetts Bay in 1691." },
+                { "name": "Massachusetts Bay Colony (1630)", "notes": "Puritan migration led by John Winthrop ('City upon a Hill'); strict theocratic governance." },
+                { "name": "Rhode Island (1636)", "notes": "Founded by Roger Williams after banishment from Massachusetts; first colony to guarantee religious freedom." },
+                { "name": "Connecticut (1636)", "notes": "Founded by Thomas Hooker; Fundamental Orders (1639) often cited as first written constitution in the colonies." },
+                { "name": "New Hampshire (1679)" }
+              ]
+            },
+            {
+              "name": "Middle Colonies",
+              "children": [
+                { "name": "New York (1664)", "notes": "England seizes New Netherland from the Dutch; renamed for the Duke of York." },
+                { "name": "New Jersey (1664)" },
+                { "name": "Pennsylvania (1681)", "notes": "Founded by William Penn as a Quaker haven; Philadelphia becomes the largest colonial city." },
+                { "name": "Delaware (1704)", "notes": "Separated from Pennsylvania; granted own assembly." }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Colonial Society and Economy",
+          "children": [
+            { "name": "Headright system", "notes": "Offered land grants to those who paid passage for indentured servants; fueled immigration but concentrated land ownership." },
+            { "name": "Indentured servitude", "notes": "Dominant labor system in early Virginia and Maryland; servants worked 4–7 years to pay off passage." },
+            { "name": "Introduction of enslaved Africans (1619)", "notes": "First Africans arrive in Virginia; chattel slavery gradually institutionalized through the 17th century." },
+            { "name": "Triangular Trade", "notes": "Linked Europe, Africa, and the Americas: manufactured goods to Africa, enslaved people to the Americas, raw materials back to Europe." },
+            { "name": "Navigation Acts (1651–1696)", "notes": "British mercantilist laws restricting colonial trade to British ships; sow seeds of colonial resentment." }
+          ]
+        },
+        {
+          "name": "Key Colonial Conflicts",
+          "children": [
+            { "name": "Pequot War (1636–1638)", "notes": "English colonists and Narragansett allies destroy the Pequot nation; opens Connecticut Valley to settlement." },
+            { "name": "King Philip's War (1675–1676)", "notes": "Wampanoag leader Metacom (King Philip) leads a broad Native coalition against New England colonists; one of the deadliest colonial wars relative to population." },
+            { "name": "Bacon's Rebellion (1676)", "notes": "Nathaniel Bacon leads frontier planters and discontented servants against Virginia's governor; alarmed elites accelerate shift from indentured servitude to race-based slavery." },
+            { "name": "Salem Witch Trials (1692)", "notes": "Mass hysteria leads to the execution of 20 people in Salem, Massachusetts; later seen as a cautionary tale about theocracy and mob justice." },
+            { "name": "King William's War (1689–1697)" },
+            { "name": "Queen Anne's War (1702–1713)", "notes": "North American theater of the War of the Spanish Succession; Britain gains Acadia (Nova Scotia) and Newfoundland." },
+            { "name": "King George's War (1744–1748)" },
+            {
+              "name": "French and Indian War (1754–1763)",
+              "notes": "North American theater of the Seven Years' War; Britain defeats France and gains Canada and all territory east of the Mississippi.",
+              "children": [
+                { "name": "Washington's early defeat at Fort Necessity (1754)" },
+                { "name": "Braddock's defeat (1755)" },
+                { "name": "Fall of Quebec (1759)" },
+                { "name": "Treaty of Paris (1763)", "notes": "France cedes Canada and Louisiana east of the Mississippi to Britain; Spain cedes Florida." }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Colonial Intellectual Life",
+          "children": [
+            { "name": "Harvard College founded (1636)", "notes": "First institution of higher learning in British North America; originally trained Puritan ministers." },
+            { "name": "The Great Awakening (~1730s–1740s)", "notes": "Religious revival movement led by George Whitefield and Jonathan Edwards; challenged established churches and encouraged individual spiritual experience, inadvertently fostering democratic ideals." },
+            { "name": "Benjamin Franklin's experiments and publications", "notes": "Poor Richard's Almanack (1732), electricity experiments (1750s); embodied Enlightenment ideals of reason and self-improvement." },
+            { "name": "Enlightenment influence", "notes": "Ideas of Locke, Montesquieu, and Rousseau circulate among colonial elites; natural rights philosophy underpins later revolutionary arguments." }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Road to Revolution (1763–1775)",
+      "children": [
+        { "name": "Proclamation of 1763", "notes": "Britain bars colonists from settling west of the Appalachians to pacify Native allies; widely ignored and resented." },
+        { "name": "Stamp Act (1765)", "notes": "First direct tax on colonists; triggers 'no taxation without representation' protests and the Stamp Act Congress." },
+        { "name": "Townshend Acts (1767)", "notes": "Taxes on imported goods; colonial boycotts follow." },
+        { "name": "Boston Massacre (1770)", "notes": "British soldiers kill five colonists during a confrontation; Paul Revere's engraving turns it into a propaganda coup." },
+        { "name": "Boston Tea Party (1773)", "notes": "Sons of Liberty dump 342 chests of British East India Company tea into Boston Harbor to protest the Tea Act." },
+        { "name": "Intolerable Acts / Coercive Acts (1774)", "notes": "Britain's punitive response to the Tea Party; closes Boston Harbor, revokes Massachusetts charter, and mandates quartering of troops." },
+        { "name": "First Continental Congress (1774)", "notes": "Delegates from twelve colonies meet in Philadelphia; agree to boycott British goods and petition the king." },
+        { "name": "Battles of Lexington and Concord (April 1775)", "notes": "'The shot heard round the world'; open armed conflict begins between colonial militias and British regulars." },
+        { "name": "Second Continental Congress convenes (May 1775)", "notes": "Assumes governance of the colonies; establishes the Continental Army and appoints George Washington as commander." },
+        { "name": "Common Sense published (January 1776)", "notes": "Thomas Paine's pamphlet argues for independence in plain language; sells 500,000 copies and shifts colonial public opinion decisively." }
+      ]
+    }
+  ]
+}
