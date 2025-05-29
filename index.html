@@ -276,6 +276,71 @@
     .toast.visible { opacity: 1; }
     .toast.ok  { background: #28a745; }
     .toast.err { background: #dc3545; }
+
+    .children-panel {
+      position: fixed;
+      top: 50%;
+      left: 10px;
+      transform: translateY(-50%);
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 8px 0;
+      font-family: monospace;
+      font-size: 12px;
+      color: #555;
+      max-height: 60vh;
+      overflow-y: auto;
+      min-width: 140px;
+      max-width: 220px;
+    }
+
+    .children-panel .panel-header {
+      padding: 2px 12px 6px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #999;
+      border-bottom: 1px solid #eee;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .children-panel .panel-item {
+      padding: 3px 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .children-panel .panel-item:hover { background: #f5f5f5; }
+
+    .children-panel .panel-item.done-item { color: #aaa; }
+
+    .children-panel .panel-item .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      border: 1.5px solid steelblue;
+      flex-shrink: 0;
+    }
+
+    .children-panel .panel-item.done-item .dot {
+      background: orange;
+      border-color: orange;
+    }
+
+    .children-panel .panel-empty {
+      padding: 4px 12px;
+      color: #bbb;
+      font-style: italic;
+    }
     </style>
   </head>
   <body>
@@ -286,6 +351,7 @@
       <span id="searchCount" class="search-count"></span>
     </div>
     <div id="breadcrumb" class="breadcrumb"></div>
+    <div id="childrenPanel" class="children-panel"></div>
     <div id="progress" class="progress">
       <a href="/trees">← all trees</a>
       <span id="progressCount"></span>
@@ -865,6 +931,33 @@
           document.getElementById('breadcrumb').textContent = '';
         }
         saveCollapsedState();
+
+        const panel = document.getElementById('childrenPanel');
+        panel.innerHTML = '';
+        const header = document.createElement('div');
+        header.className = 'panel-header';
+        header.textContent = selectedNodeData ? selectedNodeData.name : '';
+        panel.appendChild(header);
+        const children = selectedNodeData?.children || [];
+        if (children.length === 0) {
+          const empty = document.createElement('div');
+          empty.className = 'panel-empty';
+          empty.textContent = 'no children';
+          panel.appendChild(empty);
+        } else {
+          children.forEach(child => {
+            const item = document.createElement('div');
+            item.className = 'panel-item' + (child.done ? ' done-item' : '');
+            const dot = document.createElement('span');
+            dot.className = 'dot';
+            const label = document.createElement('span');
+            label.textContent = child.name;
+            item.appendChild(dot);
+            item.appendChild(label);
+            item.addEventListener('click', () => { selectedNodeData = child; update(); panToSelected(); });
+            panel.appendChild(item);
+          });
+        }
       }
 
       let toastTimer;
