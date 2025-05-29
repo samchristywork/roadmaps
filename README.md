@@ -18,6 +18,22 @@ shows how many items are complete across the whole tree.
 
 ## Features
 
+- Interactive tree visualization powered by D3.js
+- Vim-style keyboard navigation (`hjkl`)
+- Node operations: insert child, insert sibling, rename, duplicate, delete, promote children
+- Cut-and-paste to move nodes anywhere in the tree
+- Mark nodes done with progress tracking across the whole tree
+- Per-node notes with optional inline display
+- Collapse and expand subtrees; collapse/expand all
+- Incremental search with match cycling (`/`, `n`, `N`)
+- Undo and redo (up to 100 levels)
+- Sort children alphabetically
+- Import from indented plain text or JSON; upload from file
+- Export as plain text, Markdown checklist, or JSON
+- Dark mode toggle
+- Breadcrumb navigation bar and children sidebar panel
+- Multiple roadmaps with a management page for create, rename, and delete
+
 ## Keybindings
 
 ## Usage
