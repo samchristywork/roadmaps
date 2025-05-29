@@ -12,6 +12,10 @@ a full set of editing commands for inserting, renaming, deleting, duplicating,
 and reordering nodes. Nodes can be marked done and a live progress counter
 shows how many items are complete across the whole tree.
 
+<p align="center">
+  <img src="./assets/screenshot.png" />
+</p>
+
 ## Features
 
 ## Keybindings
