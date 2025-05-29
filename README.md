@@ -36,6 +36,36 @@ shows how many items are complete across the whole tree.
 
 ## Keybindings
 
+| Key | Action |
+|-----|--------|
+| `h` | Go to parent |
+| `j` | Next sibling |
+| `k` | Previous sibling |
+| `l` | Go to first child |
+| `/` | Open search |
+| `n` / `N` | Next / previous match |
+| `i` | Insert child |
+| `o` / `O` | Insert sibling below / above |
+| `r` | Rename node |
+| `e` | Edit notes |
+| `t` / `Space` | Toggle done |
+| `-` | Collapse / expand |
+| `J` / `K` | Move node down / up |
+| `S` | Sort children A–Z |
+| `d` | Duplicate node |
+| `m` | Mark node for move |
+| `p` | Paste / import tree |
+| `x` | Delete node |
+| `X` | Delete node, promote children |
+| `u` / `U` | Undo / redo |
+| `s` | Save |
+| `E` | Export |
+| `[` / `]` | Collapse all / expand all |
+| `z` | Reset zoom |
+| `q` | Toggle notes display |
+| `c` | Invert colors (dark mode) |
+| `?` | Toggle keybindings panel |
+
 ## Usage
 
 ## Dependencies
