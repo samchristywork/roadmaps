@@ -345,7 +345,6 @@
         <tr><td><kbd>l</kbd></td><td>go to first child</td></tr>
         <tr><td><kbd>/</kbd></td><td>search nodes</td></tr>
         <tr><td><kbd>n</kbd> <kbd>N</kbd></td><td>next/prev match</td></tr>
-        <tr><td><kbd>f</kbd></td><td>focus selected node</td></tr>
 
         <tr><td colspan="2" class="section-header">Edit</td></tr>
         <tr><td><kbd>i</kbd></td><td>insert child</td></tr>
@@ -445,7 +444,7 @@
         const lower = term.toLowerCase();
         searchMatches = allNodes(treeData).filter(n => n.name.toLowerCase().includes(lower));
         searchIndex = 0;
-        if (searchMatches.length) { selectedNodeData = searchMatches[0]; expandToNode(searchMatches[0]); update(); }
+        if (searchMatches.length) { selectedNodeData = searchMatches[0]; expandToNode(searchMatches[0]); update(); panToSelected(); }
         else { update(); }
         document.getElementById('searchCount').textContent =
           searchMatches.length ? `1/${searchMatches.length}` : 'no match';
@@ -458,6 +457,7 @@
         expandToNode(searchMatches[searchIndex]);
         document.getElementById('searchCount').textContent = `${searchIndex + 1}/${searchMatches.length}`;
         update();
+        panToSelected();
       }
 
       function openSearch() {
@@ -858,7 +858,7 @@
             const span = document.createElement('span');
             span.textContent = n.name;
             span.style.cssText = 'cursor:pointer;text-decoration:underline dotted;';
-            span.addEventListener('click', () => { selectedNodeData = n; update(); });
+            span.addEventListener('click', () => { selectedNodeData = n; update(); panToSelected(); });
             bc.appendChild(span);
           });
         } else {
@@ -1214,10 +1214,7 @@
             toggleColors();
             dirty = false;
             break;
-          case 'f':
-            panToSelected();
-            dirty = false;
-            break;
+
           case '[':
             allNodes(treeData).forEach(n => { if (n.children?.length) collapsed.add(n); });
             dataChanged = true;
@@ -1244,7 +1241,10 @@
         }
 
         if (dataChanged) markUnsaved();
-        if (dirty) update(dataChanged ? null : built);
+        if (dirty) {
+          update(dataChanged ? null : built);
+          if (!dataChanged) panToSelected();
+        }
       });
 
       window.addEventListener('beforeunload', (e) => {
