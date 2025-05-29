@@ -2,6 +2,16 @@
 
 ## Overview
 
+Roadmaps is a browser-based interactive tree editor for building and tracking
+hierarchical plans. A Go backend serves a D3.js frontend where trees are edited
+entirely with keyboard shortcuts. Each roadmap is stored as a JSON file on the
+server and can be exported as plain text, Markdown, or JSON.
+
+The editor uses vim-style navigation (`hjkl`) to move between nodes and exposes
+a full set of editing commands for inserting, renaming, deleting, duplicating,
+and reordering nodes. Nodes can be marked done and a live progress counter
+shows how many items are complete across the whole tree.
+
 ## Features
 
 ## Keybindings
