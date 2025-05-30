@@ -68,6 +68,19 @@ shows how many items are complete across the whole tree.
 
 ## Usage
 
+```
+go run main.go [-port <port>]
+```
+
+The server defaults to port `1235`. Set the `PORT` environment variable to
+override. Navigate to `http://localhost:1235` to manage your roadmaps.
+
+Open a specific tree directly with:
+
+```
+http://localhost:1235/?id=my-roadmap
+```
+
 ## Dependencies
 
 ## License
