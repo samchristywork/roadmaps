@@ -83,6 +83,12 @@ http://localhost:1235/?id=my-roadmap
 
 ## Dependencies
 
+```
+go
+```
+
+The frontend loads D3.js from a CDN at runtime; no build step is required.
+
 ## License
 
 This work is licensed under the GNU General Public License version 3 (GPLv3).
